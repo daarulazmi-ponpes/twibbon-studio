@@ -1,3 +1,104 @@
 {
-  "campaigns": []
+  "campaigns": [
+    {
+      "id": "harlah-ke-4",
+      "title": "Harlah Pondok Pesantren Daarul Azmi Ke-4",
+      "description": "Rayakan bersama Harlah Pondok Pesantren Daarul Azmi ke-4. Gunakan bingkai spesial ini untuk menunjukkan semangat dan kebanggaan Anda!",
+      "category": "harlah",
+      "cover": "campaigns/harlah/cover.png",
+      "status": "active",
+      "startDate": "2026-11-01",
+      "endDate": "2026-11-30",
+      "frames": [
+        {
+          "name": "Frame Harlah Emas",
+          "image": "campaigns/harlah/frame-1.png"
+        },
+        {
+          "name": "Frame Harlah Hijau",
+          "image": "campaigns/harlah/frame-2.png"
+        }
+      ]
+    },
+    {
+      "id": "maulid-nabi",
+      "title": "Maulid Nabi Muhammad SAW 1448 H",
+      "description": "Peringati Maulid Nabi Muhammad SAW dengan bingkai spesial. Sebarkan cinta dan kasih sayang Rasulullah SAW.",
+      "category": "maulid",
+      "cover": "campaigns/maulid/cover.png",
+      "status": "active",
+      "startDate": "2026-09-01",
+      "endDate": "2026-09-30",
+      "frames": [
+        {
+          "name": "Frame Maulid",
+          "image": "campaigns/maulid/frame-1.png"
+        }
+      ]
+    },
+    {
+      "id": "wisuda-santri",
+      "title": "Wisuda Santri Daarul Azmi 2026",
+      "description": "Selamatkan para santri yang telah menyelesaikan studinya di Pondok Pesantren Daarul Azmi.",
+      "category": "wisuda",
+      "cover": "campaigns/wisuda/cover.png",
+      "status": "inactive",
+      "startDate": "2026-06-01",
+      "endDate": "2026-06-30",
+      "frames": [
+        {
+          "name": "Frame Wisuda",
+          "image": "campaigns/wisuda/frame-1.png"
+        }
+      ]
+    },
+    {
+      "id": "tahun-baruislam",
+      "title": "Tahun Baru Islam 1448 H",
+      "description": "Selamat Tahun Baru Islam 1448 H. Mari bersama-sama meningkatkan semangat beribadah dan belajar.",
+      "category": "islam",
+      "cover": "campaigns/islam/cover.png",
+      "status": "inactive",
+      "startDate": "2026-07-01",
+      "endDate": "2026-07-31",
+      "frames": [
+        {
+          "name": "Frame Tahun Baru Islam",
+          "image": "campaigns/islam/frame-1.png"
+        }
+      ]
+    },
+    {
+      "id": "ramadan",
+      "title": "Ramadan 1448 H",
+      "description": "Sambut bulan suci Ramadan dengan penuh kegembiraan. Gunakan bingkai Ramadan ini untuk berbagi semangat ibadah.",
+      "category": "ramadan",
+      "cover": "campaigns/ramadan/cover.png",
+      "status": "inactive",
+      "startDate": "2026-03-01",
+      "endDate": "2026-03-31",
+      "frames": [
+        {
+          "name": "Frame Ramadan",
+          "image": "campaigns/ramadan/frame-1.png"
+        }
+      ]
+    },
+    {
+      "id": "ppdb-2026",
+      "title": "PPDB Daarul Azmi 2026",
+      "description": "Penerimaan Peserta Didik Baru Pondok Pesantren Daarul Azmi tahun 2026. Daftarkan diri Anda sekarang!",
+      "category": "ppdb",
+      "cover": "campaigns/ppdb/cover.png",
+      "status": "inactive",
+      "startDate": "2026-01-01",
+      "endDate": "2026-12-31",
+      "frames": [
+        {
+          "name": "Frame PPDB",
+          "image": "campaigns/ppdb/frame-1.png"
+        }
+      ]
+    }
+  ]
 }
