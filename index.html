@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daarul Azmi Twibbon Studio - Satu Bingkai, Satu Semangat</title>
+  <meta name="description" content="Platform resmi pembuatan foto Twibbon untuk kegiatan Pondok Pesantren Daarul Azmi.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/logo/logo.png" type="image/png">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a5d1a">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <img src="assets/logo/logo.png" alt="Logo Daarul Azmi">
+        <div class="logo-text">Twibbon <span>Studio</span></div>
+      </a>
+      
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+      
+      <nav class="nav" id="main-nav">
+        <ul class="nav-links">
+          <li><a href="index.html" class="active">Beranda</a></li>
+          <li><a href="kampanye.html">Kampanye</a></li>
+          <li><a href="panduan.html">Panduan</a></li>
+          <li><a href="#tentang">Tentang</a></li>
+          <li><a href="login.html" class="btn btn-sm btn-outline">Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>DAARUL AZMI <span>TWIBBON STUDIO</span></h1>
+      <p>"Satu Bingkai, Satu Semangat, Bersama Daarul Azmi."</p>
+      <p>Buat foto Twibbon keren untuk mendukung kegiatan Pondok Pesantren Daarul Azmi.</p>
+      <div class="hero-buttons">
+        <a href="kampanye.html" class="btn btn-secondary btn-lg">Mulai Buat Twibbon</a>
+        <a href="panduan.html" class="btn btn-outline btn-lg" style="border-color: white; color: white;">Cara Penggunaan</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Campaigns -->
+  <section class="section bg-cream">
+    <div class="container">
+      <h2 class="section-title">Kampanye Unggulan</h2>
+      <p class="section-subtitle">Dukung kegiatan Pondok Pesantren Daarul Azmi dengan Twibbon</p>
+      <div class="campaigns-grid" id="featured-campaigns">
+        <!-- Campaigns will be loaded by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="section bg-white">
+    <div class="container">
+      <h2 class="section-title">Kategori Kegiatan</h2>
+      <div class="categories-grid">
+        <div class="category-card" data-category="harlah">
+          <div class="category-icon">🎉</div>
+          <div class="category-name">Harlah</div>
+        </div>
+        <div class="category-card" data-category="maulid">
+          <div class="category-icon">🌙</div>
+          <div class="category-name">Maulid Nabi</div>
+        </div>
+        <div class="category-card" data-category="wisuda">
+          <div class="category-icon">🎓</div>
+          <div class="category-name">Wisuda</div>
+        </div>
+        <div class="category-card" data-category="islam">
+          <div class="category-icon">☪️</div>
+          <div class="category-name">Tahun Baru Islam</div>
+        </div>
+        <div class="category-card" data-category="ramadan">
+          <div class="category-icon">🕌</div>
+          <div class="category-name">Ramadan</div>
+        </div>
+        <div class="category-card" data-category="ppdb">
+          <div class="category-icon">📝</div>
+          <div class="category-name">PPDB</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guide Section -->
+  <section class="section bg-cream">
+    <div class="container">
+      <h2 class="section-title">Cara Menggunakan</h2>
+      <div class="guide-steps">
+        <div class="guide-step">
+          <div class="step-number">1</div>
+          <h3 class="step-title">Pilih Kampanye</h3>
+          <p class="step-description">Pilih kampanye dan bingkai Twibbon yang Anda inginkan.</p>
+        </div>
+        <div class="guide-step">
+          <div class="step-number">2</div>
+          <h3 class="step-title">Upload Foto</h3>
+          <p class="step-description">Upload foto Anda dari galeri atau ambil foto langsung.</p>
+        </div>
+        <div class="guide-step">
+          <div class="step-number">3</div>
+          <h3 class="step-title">Atur Posisi</h3>
+          <p class="step-description">Geser, zoom, dan putar foto agar pas dengan bingkai.</p>
+        </div>
+        <div class="guide-step">
+          <div class="step-number">4</div>
+          <h3 class="step-title">Download</h3>
+          <p class="step-description">Download hasil Twibbon dan bagikan ke media sosial.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- All Campaigns -->
+  <section class="section bg-white">
+    <div class="container">
+      <h2 class="section-title">Semua Kampanye</h2>
+      <p class="section-subtitle">Temukan bingkai Twibbon untuk berbagai kegiatan</p>
+      <div class="campaigns-grid" id="all-campaigns">
+        <!-- Campaigns will be loaded by JS -->
+      </div>
+      <div class="text-center mt-lg">
+        <a href="kampanye.html" class="btn btn-primary">Lihat Semua Kampanye</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="tentang">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Tentang Twibbon Studio</h3>
+        <p>Daarul Azmi Twibbon Studio adalah platform resmi pembuatan foto Twibbon untuk mendukung dan mempromosikan kegiatan Pondok Pesantren Daarul Azmi.</p>
+      </div>
+      <div class="footer-section">
+        <h3>Navigasi</h3>
+        <p><a href="index.html">Beranda</a></p>
+        <p><a href="kampanye.html">Kampanye</a></p>
+        <p><a href="panduan.html">Panduan</a></p>
+      </div>
+      <div class="footer-section">
+        <h3>Pondok Pesantren Daarul Azmi</h3>
+        <p>Membentuk generasi Qurani yang berakhlakul karimah dan berilmu pengetahuan.</p>
+        <p style="margin-top: 1rem;"><a href="https://daarulazmi.ponpes.id" target="_blank">daarulazmi.ponpes.id</a></p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Daarul Azmi Twibbon Studio. Hak cipta dilindungi undang-undang.</p>
+    </div>
+  </footer>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <!-- Scripts -->
+  <script src="js/campaigns.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

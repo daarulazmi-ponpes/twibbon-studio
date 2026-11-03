@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Admin - Daarul Azmi Twibbon Studio</title>
+  <meta name="description" content="Halaman login admin untuk mengelola kampanye Twibbon.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/logo/logo.png" type="image/png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/mobile.css">
+
+  <style>
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+      padding: var(--spacing-md);
+    }
+
+    .login-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: var(--spacing-xl);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .login-logo img {
+      height: 80px;
+      width: auto;
+      margin: 0 auto var(--spacing-sm);
+    }
+
+    .login-logo h1 {
+      font-size: 1.5rem;
+      color: var(--primary-green);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .login-logo p {
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+    }
+
+    .login-form .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .login-form .form-label {
+      display: block;
+      margin-bottom: var(--spacing-xs);
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .login-form .form-control {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid var(--gray);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      transition: border-color var(--transition-fast);
+    }
+
+    .login-form .form-control:focus {
+      border-color: var(--primary-green);
+    }
+
+    .login-form .btn {
+      width: 100%;
+      padding: 0.875rem;
+      font-size: 1rem;
+      margin-top: var(--spacing-sm);
+    }
+
+    .login-error {
+      background-color: #fee;
+      border: 1px solid #fcc;
+      color: #c00;
+      padding: var(--spacing-sm);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-md);
+      text-align: center;
+      display: none;
+    }
+
+    .login-error.show {
+      display: block;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: var(--spacing-lg);
+      padding-top: var(--spacing-md);
+      border-top: 1px solid var(--gray);
+    }
+
+    .login-footer a {
+      color: var(--primary-green);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="assets/logo/logo.png" alt="Logo Daarul Azmi">
+        <h1>Twibbon Studio</h1>
+        <p>Panel Admin</p>
+      </div>
+
+      <div class="login-error" id="login-error">
+        Username atau password salah. Silakan coba lagi.
+      </div>
+
+      <form class="login-form" id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="email">Username</label>
+          <input type="text" class="form-control" id="email" name="email" placeholder="Masukkan username" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Masuk</button>
+      </form>
+
+      <div class="login-footer">
+        <a href="index.html">← Kembali ke Beranda</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Credential admin
+    const ADMIN_EMAIL = 'admin@ppda';
+    const ADMIN_PASSWORD = 'da2026';
+
+    // Check if already logged in
+    if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+      window.location.href = 'admin.html';
+    }
+
+    // Handle login form
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('login-error');
+
+      // Validate credentials
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        // Set session storage
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        sessionStorage.setItem('adminEmail', email);
+
+        // Redirect to admin panel
+        window.location.href = 'admin.html';
+      } else {
+        // Show error
+        errorEl.classList.add('show');
+
+        // Shake animation
+        const card = document.querySelector('.login-card');
+        card.style.animation = 'shake 0.5s ease';
+        setTimeout(() => {
+          card.style.animation = '';
+        }, 500);
+      }
+    });
+
+    // Add shake keyframes dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-10px); }
+        40% { transform: translateX(10px); }
+        60% { transform: translateX(-10px); }
+        80% { transform: translateX(10px); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

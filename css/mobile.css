@@ -1,0 +1,153 @@
+/* ============================================
+   DAARUL AZMI TWIBBON STUDIO - Mobile Styles
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Header */
+  .header-inner {
+    flex-wrap: wrap;
+  }
+  
+  .menu-toggle {
+    display: block;
+  }
+  
+  .nav {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    padding-top: var(--spacing-sm);
+  }
+  
+  .nav.show {
+    display: flex;
+  }
+  
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--spacing-sm);
+  }
+  
+  .nav-links a {
+    display: block;
+    padding: var(--spacing-sm);
+    background-color: var(--light-gray);
+    border-radius: var(--radius-md);
+  }
+  
+  /* Hero */
+  .hero {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
+  
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+  }
+  
+  .hero-buttons .btn {
+    width: 100%;
+  }
+  
+  /* Campaigns Grid */
+  .campaigns-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  /* Categories */
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Guide Steps */
+  .guide-steps {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Footer */
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Search & Filter */
+  .search-input-group {
+    flex-direction: column;
+  }
+  
+  /* Campaign Detail */
+  .campaign-detail {
+    padding: var(--spacing-md);
+  }
+  
+  .campaign-detail-title {
+    font-size: 1.5rem;
+  }
+  
+  .frame-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Section */
+  .section {
+    padding: var(--spacing-lg) 0;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  /* Editor */
+  .editor-container {
+    flex-direction: column;
+  }
+  
+  .editor-canvas-area {
+    width: 100%;
+  }
+  
+  .editor-controls {
+    width: 100%;
+    order: -1;
+  }
+  
+  /* Panduan */
+  .panduan-content {
+    padding: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 1rem;
+  }
+  
+  .logo img {
+    height: 40px;
+  }
+  
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+  
+  .btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .campaign-card-img {
+    height: 150px;
+  }
+  
+  .frame-options {
+    grid-template-columns: 1fr;
+  }
+}

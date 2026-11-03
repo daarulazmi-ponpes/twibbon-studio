@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Daarul Azmi Twibbon Studio</title>
+  <meta name="description" content="Panel admin untuk mengelola kampanye Twibbon.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/logo/logo.png" type="image/png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/mobile.css">
+
+  <style>
+    body {
+      background-color: var(--light-gray);
+    }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .admin-sidebar {
+      width: 260px;
+      background-color: var(--primary-green-dark);
+      color: var(--white);
+      padding: var(--spacing-lg) 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .admin-sidebar .logo {
+      padding: 0 var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: var(--spacing-md);
+    }
+
+    .admin-sidebar .logo img {
+      height: 50px;
+      width: auto;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .admin-sidebar .logo h2 {
+      font-size: 1.1rem;
+      color: var(--accent-gold);
+    }
+
+    .admin-sidebar .logo p {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .admin-nav {
+      list-style: none;
+      padding: 0;
+    }
+
+    .admin-nav li a {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: 0.75rem var(--spacing-md);
+      color: rgba(255,255,255,0.8);
+      transition: all var(--transition-fast);
+    }
+
+    .admin-nav li a:hover,
+    .admin-nav li a.active {
+      background-color: rgba(255,255,255,0.1);
+      color: var(--white);
+    }
+
+    .admin-nav li a .icon {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    /* Main content */
+    .admin-main {
+      flex: 1;
+      margin-left: 260px;
+      padding: var(--spacing-lg);
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+      background: var(--white);
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .admin-header h1 {
+      font-size: 1.5rem;
+      color: var(--primary-green);
+    }
+
+    .admin-header .user-info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .admin-header .user-info span {
+      color: var(--dark-gray);
+    }
+
+    .btn-logout {
+      background-color: #dc3545;
+      color: var(--white);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+    }
+
+    .btn-logout:hover {
+      background-color: #c82333;
+    }
+
+    /* Stats cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .stat-card {
+      background: var(--white);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-card .stat-icon {
+      font-size: 2rem;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-green);
+    }
+
+    .stat-card .stat-label {
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+    }
+
+    /* Campaign table */
+    .admin-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .admin-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .admin-card-header h2 {
+      font-size: 1.25rem;
+      color: var(--primary-green);
+    }
+
+    .campaign-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .campaign-table th,
+    .campaign-table td {
+      padding: var(--spacing-sm) var(--spacing-md);
+      text-align: left;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    .campaign-table th {
+      background-color: var(--light-gray);
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .campaign-table tr:hover {
+      background-color: var(--light-gray);
+    }
+
+    .campaign-table .campaign-cover {
+      width: 60px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+    }
+
+    .campaign-table .actions {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .btn-icon {
+      padding: 0.4rem 0.6rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+    }
+
+    .btn-edit {
+      background-color: #17a2b8;
+      color: var(--white);
+    }
+
+    .btn-edit:hover {
+      background-color: #138496;
+    }
+
+    .btn-delete {
+      background-color: #dc3545;
+      color: var(--white);
+    }
+
+    .btn-delete:hover {
+      background-color: #c82333;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-md);
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--gray);
+    }
+
+    .modal-header h3 {
+      color: var(--primary-green);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--dark-gray);
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: var(--spacing-lg);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-top: 1px solid var(--gray);
+    }
+
+    /* Frame management in modal */
+    .frame-list {
+      margin-top: var(--spacing-sm);
+    }
+
+    .frame-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-xs) 0;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    .frame-item:last-child {
+      border-bottom: none;
+    }
+
+    .btn-remove-frame {
+      background: none;
+      border: none;
+      color: #dc3545;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar {
+        transform: translateX(-100%);
+        transition: transform var(--transition-normal);
+      }
+
+      .admin-sidebar.show {
+        transform: translateX(0);
+      }
+
+      .admin-main {
+        margin-left: 0;
+      }
+
+      .campaign-table {
+        font-size: 0.875rem;
+      }
+
+      .campaign-table .campaign-cover {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="logo">
+        <img src="assets/logo/logo.png" alt="Logo Daarul Azmi">
+        <h2>Twibbon Studio</h2>
+        <p>Panel Admin</p>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="#" class="active"><span class="icon">📊</span> Dashboard</a></li>
+        <li><a href="#"><span class="icon">📋</span> Kampanye</a></li>
+        <li><a href="index.html" target="_blank"><span class="icon">🌐</span> Lihat Website</a></li>
+        <li><a href="editor.html" target="_blank"><span class="icon">🎨</span> Coba Editor</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="admin-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p style="color: var(--dark-gray);">Kelola kampanye Twibbon Daarul Azmi</p>
+        </div>
+        <div class="user-info">
+          <span id="admin-email">admin@ppda</span>
+          <button class="btn-logout" id="btn-logout">Keluar</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total Kampanye</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="stat-active">0</div>
+          <div class="stat-label">Kampanye Aktif</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏸️</div>
+          <div class="stat-value" id="stat-inactive">0</div>
+          <div class="stat-label">Kampanye Tidak Aktif</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🖼️</div>
+          <div class="stat-value" id="stat-frames">0</div>
+          <div class="stat-label">Total Bingkai</div>
+        </div>
+      </div>
+
+      <!-- Campaign Table -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2>Daftar Kampanye</h2>
+          <button class="btn btn-primary" id="btn-add-campaign">+ Tambah Kampanye</button>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="campaign-table">
+            <thead>
+              <tr>
+                <th>Cover</th>
+                <th>Judul</th>
+                <th>Kategori</th>
+                <th>Status</th>
+                <th>Tanggal</th>
+                <th>Bingkai</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="campaign-table-body">
+              <!-- Will be populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Campaign Modal -->
+  <div class="modal-overlay" id="campaign-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Tambah Kampanye</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="campaign-form">
+          <input type="hidden" id="campaign-id">
+
+          <div class="form-group">
+            <label class="form-label" for="campaign-title">Judul Kampanye</label>
+            <input type="text" class="form-control" id="campaign-title" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="campaign-description">Deskripsi</label>
+            <textarea class="form-control" id="campaign-description" rows="3" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="campaign-category">Kategori</label>
+            <select class="form-control" id="campaign-category" required>
+              <option value="">Pilih kategori</option>
+              <option value="harlah">Harlah</option>
+              <option value="maulid">Maulid Nabi</option>
+              <option value="wisuda">Wisuda</option>
+              <option value="islam">Tahun Baru Islam</option>
+              <option value="ramadan">Ramadan</option>
+              <option value="ppdb">PPDB</option>
+              <option value="lainnya">Lainnya</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="campaign-cover">URL Cover Image</label>
+            <input type="text" class="form-control" id="campaign-cover" placeholder="campaigns/kategori/cover.png" required>
+            <small style="color: var(--dark-gray);">Contoh: campaigns/harlah/cover.png</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="campaign-status">Status</label>
+            <select class="form-control" id="campaign-status" required>
+              <option value="active">Aktif</option>
+              <option value="inactive">Tidak Aktif</option>
+            </select>
+          </div>
+
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+            <div class="form-group">
+              <label class="form-label" for="campaign-start-date">Tanggal Mulai</label>
+              <input type="date" class="form-control" id="campaign-start-date" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="campaign-end-date">Tanggal Selesai</label>
+              <input type="date" class="form-control" id="campaign-end-date" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Bingkai (Frames)</label>
+            <div class="frame-list" id="frame-list">
+              <!-- Frame items will be added here -->
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" id="btn-add-frame" style="margin-top: var(--spacing-sm);">+ Tambah Bingkai</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="btn-cancel-modal">Batal</button>
+        <button type="button" class="btn btn-primary" id="btn-save-campaign">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <!-- Scripts -->
+  <script src="js/admin.js"></script>
+</body>
+</html>

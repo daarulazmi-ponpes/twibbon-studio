@@ -1,0 +1,18 @@
+{
+  "name": "Daarul Azmi Twibbon Studio",
+  "short_name": "Twibbon Studio",
+  "description": "Platform resmi pembuatan foto Twibbon untuk kegiatan Pondok Pesantren Daarul Azmi.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#faf8f0",
+  "theme_color": "#1a5d1a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "assets/logo/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

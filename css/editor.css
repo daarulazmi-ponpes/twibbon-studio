@@ -1,0 +1,357 @@
+/* ============================================
+   DAARUL AZMI TWIBBON STUDIO - Editor Styles
+   ============================================ */
+
+.editor-page {
+  background-color: var(--light-gray);
+  min-height: 100vh;
+  padding: var(--spacing-md);
+}
+
+.editor-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+/* Canvas Area */
+.editor-canvas-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.canvas-wrapper {
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.canvas-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-green);
+  margin-bottom: var(--spacing-sm);
+}
+
+.canvas-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#editor-canvas {
+  width: 100%;
+  height: auto;
+  border: 2px dashed var(--gray);
+  border-radius: var(--radius-md);
+  cursor: move;
+  touch-action: none;
+}
+
+.canvas-placeholder {
+  width: 100%;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--gray);
+  border-radius: var(--radius-md);
+  background-color: var(--light-gray);
+  color: var(--dark-gray);
+  gap: var(--spacing-sm);
+}
+
+.canvas-placeholder svg {
+  width: 64px;
+  height: 64px;
+  fill: var(--gray);
+}
+
+.canvas-placeholder p {
+  font-size: 1rem;
+}
+
+/* Upload Area */
+.upload-area {
+  margin-top: var(--spacing-md);
+  text-align: center;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-green);
+  color: var(--white);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: background-color var(--transition-fast);
+}
+
+.upload-btn:hover {
+  background-color: var(--primary-green-dark);
+}
+
+.upload-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+#file-input {
+  display: none;
+}
+
+/* Controls Panel */
+.editor-controls {
+  width: 350px;
+  flex-shrink: 0;
+}
+
+.controls-panel {
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-md);
+  position: sticky;
+  top: 80px;
+}
+
+.controls-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-green);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--gray);
+}
+
+.control-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.control-label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.9rem;
+}
+
+.control-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--gray);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.control-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--primary-green);
+  cursor: pointer;
+}
+
+.control-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--primary-green);
+  cursor: pointer;
+  border: none;
+}
+
+.control-value {
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+  margin-top: var(--spacing-xs);
+}
+
+.control-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.control-btn {
+  flex: 1;
+  padding: 0.625rem;
+  background-color: var(--light-gray);
+  color: var(--text-dark);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.control-btn:hover {
+  background-color: var(--primary-green);
+  color: var(--white);
+}
+
+.control-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* Frame Selection */
+.frame-selection {
+  margin-bottom: var(--spacing-md);
+}
+
+.frame-options-editor {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.frame-option-editor {
+  border: 3px solid var(--gray);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.frame-option-editor:hover,
+.frame-option-editor.selected {
+  border-color: var(--primary-green);
+}
+
+.frame-option-editor img {
+  width: 100%;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: var(--spacing-xs);
+}
+
+.frame-option-editor .frame-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Download Buttons */
+.download-section {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 2px solid var(--gray);
+}
+
+.download-btn {
+  width: 100%;
+  padding: 0.875rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.download-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.download-btn-png {
+  background-color: var(--primary-green);
+  color: var(--white);
+}
+
+.download-btn-png:hover {
+  background-color: var(--primary-green-dark);
+}
+
+.download-btn-jpg {
+  background-color: var(--accent-gold);
+  color: var(--text-dark);
+}
+
+.download-btn-jpg:hover {
+  background-color: var(--accent-gold-dark);
+  color: var(--white);
+}
+
+/* Photo Info */
+.photo-info {
+  background-color: var(--light-gray);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+}
+
+.photo-info-name {
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-xs);
+  word-break: break-all;
+}
+
+.photo-info-size {
+  font-size: 0.8rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .editor-container {
+    flex-direction: column;
+  }
+  
+  .editor-controls {
+    width: 100%;
+    order: -1;
+  }
+  
+  .controls-panel {
+    position: static;
+  }
+  
+  .canvas-container {
+    max-width: 100%;
+  }
+  
+  .frame-options-editor {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .editor-page {
+    padding: var(--spacing-sm);
+  }
+  
+  .canvas-wrapper,
+  .controls-panel {
+    padding: var(--spacing-sm);
+  }
+  
+  .frame-options-editor {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

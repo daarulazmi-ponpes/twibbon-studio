@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Twibbon - Daarul Azmi Twibbon Studio</title>
+  <meta name="description" content="Buat Twibbon Anda dengan mudah.">
+  
+  <link rel="icon" href="assets/logo/logo.png" type="image/png">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a5d1a">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <img src="assets/logo/logo.png" alt="Logo Daarul Azmi">
+        <div class="logo-text">Twibbon <span>Studio</span></div>
+      </a>
+      
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+      
+      <nav class="nav" id="main-nav">
+        <ul class="nav-links">
+          <li><a href="index.html">Beranda</a></li>
+          <li><a href="kampanye.html">Kampanye</a></li>
+          <li><a href="panduan.html">Panduan</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Editor Page -->
+  <div class="editor-page">
+    <div class="editor-container">
+      <!-- Canvas Area -->
+      <div class="editor-canvas-area">
+        <div class="canvas-wrapper">
+          <h2 class="canvas-title" id="campaign-title">Editor Twibbon</h2>
+          
+          <div class="canvas-container">
+            <canvas id="editor-canvas" width="1080" height="1080"></canvas>
+            
+            <div class="canvas-placeholder" id="canvas-placeholder">
+              <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              <p>Upload foto untuk memulai</p>
+            </div>
+          </div>
+
+          <!-- Upload Button -->
+          <div class="upload-area">
+            <button class="upload-btn" id="upload-btn">
+              <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+              <span>Upload Foto</span>
+            </button>
+            <input type="file" id="file-input" accept="image/jpeg,image/jpg,image/png,image/webp">
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="editor-controls">
+        <div class="controls-panel">
+          <h3 class="controls-title">Pengaturan</h3>
+
+          <!-- Photo Info -->
+          <div class="photo-info" id="photo-info" style="display: none;">
+            <div class="photo-info-name" id="photo-name"></div>
+            <div class="photo-info-size" id="photo-size"></div>
+          </div>
+
+          <!-- Frame Selection -->
+          <div class="frame-selection" id="frame-selection" style="display: none;">
+            <label class="control-label">Pilih Bingkai</label>
+            <div class="frame-options-editor" id="frame-options">
+              <!-- Frame options will be loaded by JS -->
+            </div>
+          </div>
+
+          <!-- Position Controls -->
+          <div id="position-controls" style="display: none;">
+            <div class="control-group">
+              <label class="control-label">Posisi Horizontal</label>
+              <input type="range" class="control-slider" id="pos-x" min="-500" max="500" value="0">
+              <div class="control-value" id="pos-x-value">0</div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Posisi Vertikal</label>
+              <input type="range" class="control-slider" id="pos-y" min="-500" max="500" value="0">
+              <div class="control-value" id="pos-y-value">0</div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Zoom</label>
+              <input type="range" class="control-slider" id="zoom" min="10" max="300" value="100">
+              <div class="control-value" id="zoom-value">100%</div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Rotasi</label>
+              <input type="range" class="control-slider" id="rotate" min="-180" max="180" value="0">
+              <div class="control-value" id="rotate-value">0°</div>
+            </div>
+
+            <div class="control-buttons">
+              <button class="control-btn" id="reset-btn">
+                <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                Reset
+              </button>
+              <button class="control-btn" id="change-photo-btn">
+                <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                Ganti Foto
+              </button>
+            </div>
+          </div>
+
+          <!-- Download Section -->
+          <div class="download-section" id="download-section" style="display: none;">
+            <button class="download-btn download-btn-png" id="download-png">
+              <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Download PNG
+            </button>
+            <button class="download-btn download-btn-jpg" id="download-jpg">
+              <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Download JPG
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p>&copy; 2026 Daarul Azmi Twibbon Studio. Hak cipta dilindungi undang-undang.</p>
+    </div>
+  </footer>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <!-- Scripts -->
+  <script src="js/campaigns.js"></script>
+  <script src="js/canvas-engine.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/download.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
