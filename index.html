@@ -188,32 +188,29 @@
   <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
+      // Guard flag to prevent infinite reload loop
+      let isReloading = false;
+      
       window.addEventListener('load', () => {
-        // Unregister any existing service workers first
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-          registrations.forEach(registration => {
-            registration.unregister();
-          });
-        });
-        
-        // Register new service worker
+        // Register service worker
         navigator.serviceWorker.register('./service-worker.js?v=20261103')
           .then(registration => {
             console.log('SW registered: ', registration);
-            // Force update if new version available
-            if (registration.waiting) {
-              registration.update();
-            }
           })
           .catch(error => {
             console.log('SW registration failed: ', error);
           });
       });
       
-      // Listen for updates
+      // Only reload once when a new service worker takes control
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('New service worker available, reloading page...');
-        window.location.reload();
+        if (!isReloading) {
+          isReloading = true;
+          console.log('New service worker available, reloading page once...');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
       });
     }
   </script>
