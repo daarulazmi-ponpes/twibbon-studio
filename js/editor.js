@@ -18,9 +18,10 @@ const EditorModule = (function() {
     CanvasEngine.init('editor-canvas');
     CanvasEngine.setupSliders();
     
-    // Get campaign ID from URL
+    // Get campaign ID and frame index from URL
     const urlParams = new URLSearchParams(window.location.search);
     const campaignId = urlParams.get('campaign');
+    const frameIndex = urlParams.get('frame');
     
     if (!campaignId) {
       showNotification('Pilih kampanye terlebih dahulu', 'error');
@@ -41,6 +42,11 @@ const EditorModule = (function() {
       
       // Update page title
       document.getElementById('campaign-title').textContent = currentCampaign.title;
+      
+      // Set frame index from URL parameter if provided
+      if (frameIndex !== null) {
+        currentFrameIndex = parseInt(frameIndex, 10) || 0;
+      }
       
       // Load frames
       await loadFrames(currentCampaign.frames);
@@ -71,7 +77,7 @@ const EditorModule = (function() {
     
     frames.forEach((frame, index) => {
       const option = document.createElement('div');
-      option.className = 'frame-option-editor' + (index === 0 ? ' selected' : '');
+      option.className = 'frame-option-editor' + (index === currentFrameIndex ? ' selected' : '');
       
       const imgHtml = frame.image 
         ? `<img src="${frame.image}" alt="${frame.name}" onerror="this.style.display='none'">`
