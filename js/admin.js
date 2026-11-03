@@ -780,9 +780,9 @@
     openModal(true);
   };
 
-  // Delete campaign
-  window.deleteCampaign = function(id) {
-    if (!confirm('Apakah Anda yakin ingin menghapus kampanye ini?')) {
+  // Delete campaign and sync to GitHub
+  window.deleteCampaign = async function(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus kampanye ini?\n\nKampanye akan dihapus dari admin panel dan disinkronkan ke server agar tidak muncul lagi untuk pengunjung.')) {
       return;
     }
 
@@ -792,7 +792,65 @@
 
     refreshDashboard();
     showNotification('Kampanye berhasil dihapus');
+
+    // Auto-sync to GitHub so visitors see the deletion immediately
+    await syncDeletedCampaignToGitHub(campaigns);
   };
+
+  // Sync deleted campaign to GitHub campaigns.json
+  async function syncDeletedCampaignToGitHub(campaigns) {
+    const token = getGitHubToken();
+    if (!token) {
+      console.log('GitHub token not set - skipping auto-sync to server');
+      return;
+    }
+
+    try {
+      // Build campaigns data with correct paths for server
+      const campaignsData = campaigns.map(c => {
+        const newCampaign = { ...c };
+        
+        // Update cover path if it's base64
+        if (newCampaign.cover && newCampaign.cover.startsWith('data:')) {
+          const mimeType = getImageMimeType(newCampaign.cover);
+          const ext = getExtensionFromMime(mimeType);
+          newCampaign.cover = 'assets/images/campaigns/' + newCampaign.id + '/cover.' + ext;
+        }
+
+        // Update frame paths if they're base64
+        if (newCampaign.frames) {
+          newCampaign.frames = newCampaign.frames.map((frame, index) => {
+            const newFrame = { ...frame };
+            if (newFrame.image && newFrame.image.startsWith('data:')) {
+              const mimeType = getImageMimeType(newFrame.image);
+              const ext = getExtensionFromMime(mimeType);
+              newFrame.image = 'assets/images/campaigns/' + newCampaign.id + '/frame-' + (index + 1) + '.' + ext;
+            }
+            return newFrame;
+          });
+        }
+
+        return newCampaign;
+      });
+
+      const jsonContent = JSON.stringify({ campaigns: campaignsData }, null, 2);
+
+      // Update campaigns.json on GitHub
+      const existingJson = await getGitHubFile('data/campaigns.json');
+      const jsonSha = existingJson ? existingJson.sha : null;
+      await createOrUpdateFile(
+        'data/campaigns.json',
+        jsonContent,
+        'Delete campaign and sync to server',
+        jsonSha
+      );
+
+      console.log('Campaign deletion synced to GitHub successfully');
+    } catch (error) {
+      console.error('Failed to sync deletion to GitHub:', error);
+      // Don't show notification - deletion from localStorage already succeeded
+    }
+  }
 
   // Save campaign
   async function saveCampaign() {
