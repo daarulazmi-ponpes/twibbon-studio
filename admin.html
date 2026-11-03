@@ -514,7 +514,10 @@
 
             <div class="form-group">
               <label class="form-label" for="github-token">GitHub Personal Access Token</label>
-              <input type="password" class="form-control" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="password" class="form-control" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="flex: 1;">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-toggle-token" style="white-space: nowrap;">👁️ Lihat</button>
+              </div>
               <small style="color: var(--dark-gray);">
                 Buat token di <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> dengan scope "repo"
               </small>

@@ -519,12 +519,18 @@
     }
   }
 
-  // Get all campaigns (localStorage first, then JSON)
+  // Get all campaigns - ALWAYS use localStorage as source of truth for admin
+  // Only fetch from JSON on first load if localStorage is completely empty
   async function getAllCampaigns() {
     let campaigns = loadCampaigns();
-    if (!campaigns || campaigns.length === 0) {
-      campaigns = await fetchCampaignsFromJSON();
+    
+    // If localStorage has campaigns (even if some were deleted), use them
+    if (campaigns && campaigns.length >= 0) {
+      return campaigns;
     }
+    
+    // Only fetch from JSON if localStorage has never been initialized
+    campaigns = await fetchCampaignsFromJSON();
     return campaigns;
   }
 
@@ -561,7 +567,10 @@
     campaigns.forEach(function(campaign) {
       const tr = document.createElement('tr');
 
-      const coverImg = campaign.cover ? `<img src="${campaign.cover}" alt="" class="campaign-cover" onerror="this.style.display='none'">` : '-';
+      // Handle cover image - base64 or path
+      let coverSrc = campaign.cover || '';
+      const coverImg = coverSrc ? `<img src="${coverSrc}" alt="" class="campaign-cover" onerror="this.style.display='none'">` : '-';
+      
       const statusBadge = campaign.status === 'active'
         ? '<span class="badge badge-active">Aktif</span>'
         : '<span class="badge badge-inactive">Tidak Aktif</span>';
@@ -670,8 +679,9 @@
       const frameItem = document.createElement('div');
       frameItem.className = 'frame-item';
       
+      // Handle both base64 and path images
       const previewContent = frame.image 
-        ? `<img src="${frame.image}" alt="Preview">`
+        ? `<img src="${frame.image}" alt="Preview" onerror="this.parentElement.innerHTML='<div class=\"placeholder\">Gagal memuat gambar</div>'">`
         : '<div class="placeholder">Belum ada gambar</div>';
 
       frameItem.innerHTML = `
@@ -706,20 +716,24 @@
             return;
           }
 
-          // Validate file size (max 2MB)
-          if (file.size > 2 * 1024 * 1024) {
-            showNotification('Ukuran file terlalu besar. Maksimal 2MB', 'error');
+          // Validate file size (max 1MB)
+          if (file.size > 1 * 1024 * 1024) {
+            showNotification('Ukuran file terlalu besar. Maksimal 1MB', 'error');
             e.target.value = '';
             return;
           }
 
           try {
             const base64 = await fileToBase64(file);
+            // Update the frame image in the array
             currentFrames[index].image = base64;
+            // Update the preview immediately
             const preview = frameItem.querySelector('.frame-item-preview');
             preview.innerHTML = `<img src="${base64}" alt="Preview">`;
             showNotification('Gambar bingkai berhasil diupload');
+            console.log('Frame', index, 'uploaded successfully, size:', base64.length);
           } catch (error) {
+            console.error('Frame upload error:', error);
             showNotification('Gagal membaca gambar', 'error');
             e.target.value = '';
           }
@@ -881,6 +895,9 @@
       }
     });
 
+    console.log('Saving campaign:', { id, title, coverLength: cover.length, framesCount: frames.length });
+    console.log('Frames data:', frames.map(f => ({ name: f.name, imageLength: f.image.length })));
+
     let campaigns = loadCampaigns() || [];
 
     if (id) {
@@ -917,7 +934,10 @@
       showNotification('Kampanye berhasil ditambahkan');
     }
 
+    // Save to localStorage
     saveCampaigns(campaigns);
+    console.log('Saved to localStorage. Total campaigns:', campaigns.length);
+    
     closeModal();
     refreshDashboard();
   }
@@ -969,8 +989,21 @@
           // Load saved token
           const token = getGitHubToken();
           const tokenInput = document.getElementById('github-token');
-          if (tokenInput && token) {
-            tokenInput.value = token;
+          const statusEl = document.getElementById('token-status');
+          
+          if (tokenInput) {
+            tokenInput.value = token || '';
+          }
+          
+          // Show token status
+          if (statusEl) {
+            if (token) {
+              statusEl.innerHTML = '<div style="color: #28a745;">✅ Token GitHub sudah tersimpan. Klik "🔍 Test Koneksi" untuk verifikasi.</div>';
+              console.log('GitHub token found in localStorage');
+            } else {
+              statusEl.innerHTML = '<div style="color: #ffc107;">⚠️ Token GitHub belum diatur. Masukkan token di atas dan klik "💾 Simpan Token".</div>';
+              console.log('No GitHub token found in localStorage');
+            }
           }
         } else {
           if (dashboardPage) dashboardPage.style.display = 'block';
@@ -1008,6 +1041,21 @@
       });
     }
 
+    // Toggle token visibility
+    const btnToggleToken = document.getElementById('btn-toggle-token');
+    if (btnToggleToken) {
+      btnToggleToken.addEventListener('click', function() {
+        const tokenInput = document.getElementById('github-token');
+        if (tokenInput.type === 'password') {
+          tokenInput.type = 'text';
+          this.textContent = '🙈 Sembunyikan';
+        } else {
+          tokenInput.type = 'password';
+          this.textContent = '👁️ Lihat';
+        }
+      });
+    }
+
     // Save GitHub token
     if (btnSaveToken) {
       btnSaveToken.addEventListener('click', function() {
@@ -1031,6 +1079,9 @@
         if (statusEl) {
           statusEl.innerHTML = '<div style="color: #28a745;">✅ Token disimpan. Klik "🔍 Test Koneksi" untuk verifikasi.</div>';
         }
+        
+        // Log to console for debugging
+        console.log('GitHub token saved successfully');
       });
     }
 
