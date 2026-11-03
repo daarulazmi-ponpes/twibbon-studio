@@ -227,14 +227,23 @@
         // Update page title
         document.title = campaign.title + ' - Pilih Frame';
         
-        // Update OG meta tags with campaign cover
+        // Update OG meta tags with campaign cover (convert relative path to absolute URL)
         if (campaign.cover) {
           const ogImage = document.getElementById('og-image');
           const ogImageSecure = document.getElementById('og-image-secure');
           const ogImageAlt = document.getElementById('og-image-alt');
-          if (ogImage) ogImage.setAttribute('content', campaign.cover);
-          if (ogImageSecure) ogImageSecure.setAttribute('content', campaign.cover);
+          const ogDescription = document.querySelector('meta[name="description"]');
+          
+          // Convert relative path to absolute URL for OG
+          let coverUrl = campaign.cover;
+          if (coverUrl && !coverUrl.startsWith('http')) {
+            coverUrl = 'https://twibbon.daarulazmi.ponpes.id/' + coverUrl;
+          }
+          
+          if (ogImage) ogImage.setAttribute('content', coverUrl);
+          if (ogImageSecure) ogImageSecure.setAttribute('content', coverUrl);
           if (ogImageAlt) ogImageAlt.setAttribute('content', campaign.title);
+          if (ogDescription) ogDescription.setAttribute('content', campaign.description);
         }
         
         const framesGrid = document.getElementById('frames-grid');

@@ -44,14 +44,23 @@ const EditorModule = (function() {
       document.getElementById('campaign-title').textContent = currentCampaign.title;
       document.title = currentCampaign.title + ' - Editor Twibbon';
       
-      // Update OG meta tags with campaign cover
+      // Update OG meta tags with campaign cover (convert relative path to absolute URL)
       if (currentCampaign.cover) {
         const ogImage = document.getElementById('og-image');
         const ogImageSecure = document.getElementById('og-image-secure');
         const ogImageAlt = document.getElementById('og-image-alt');
-        if (ogImage) ogImage.setAttribute('content', currentCampaign.cover);
-        if (ogImageSecure) ogImageSecure.setAttribute('content', currentCampaign.cover);
+        const ogDescription = document.querySelector('meta[name="description"]');
+        
+        // Convert relative path to absolute URL for OG
+        let coverUrl = currentCampaign.cover;
+        if (coverUrl && !coverUrl.startsWith('http')) {
+          coverUrl = 'https://twibbon.daarulazmi.ponpes.id/' + coverUrl;
+        }
+        
+        if (ogImage) ogImage.setAttribute('content', coverUrl);
+        if (ogImageSecure) ogImageSecure.setAttribute('content', coverUrl);
         if (ogImageAlt) ogImageAlt.setAttribute('content', currentCampaign.title);
+        if (ogDescription) ogDescription.setAttribute('content', currentCampaign.description);
       }
       
       // Set frame index from URL parameter if provided

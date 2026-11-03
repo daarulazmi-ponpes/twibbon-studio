@@ -515,12 +515,19 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="campaign-cover">Upload Cover <span style="color: #999;">(opsional)</span></label>
+            <label class="form-label" for="campaign-cover">Cover Image <span style="color: #999;">(opsional)</span></label>
             <input type="file" class="form-control" id="campaign-cover-file" accept="image/png,image/jpeg,image/webp">
-            <small style="color: var(--dark-gray);">Pilih gambar dari galeri atau file (PNG, JPG, WebP)</small>
+            <small style="color: var(--dark-gray);">Pilih gambar dari galeri, lalu upload file ke path yang ditampilkan</small>
             <div id="cover-preview" style="margin-top: 0.5rem; display: none;">
               <img id="cover-preview-img" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid #ddd;">
-              <button type="button" class="btn btn-sm" style="margin-left: 0.5rem; background: #dc3545; color: white;" onclick="document.getElementById('campaign-cover-file').value=''; document.getElementById('cover-preview').style.display='none'; window.coverBase64='';">Hapus</button>
+              <button type="button" class="btn btn-sm" style="margin-left: 0.5rem; background: #dc3545; color: white;" onclick="document.getElementById('campaign-cover-file').value=''; document.getElementById('cover-preview').style.display='none'; window.coverPath='';">Hapus</button>
+            </div>
+            <div style="background: #d1ecf1; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; font-size: 0.875rem; color: #0c5460;">
+              <strong>📋 Cara upload cover:</strong><br>
+              1. Pilih gambar di atas<br>
+              2. Upload file gambar ke path: <code id="cover-path-hint">campaigns/{id-kampanye}/cover.png</code><br>
+              3. Upload via GitHub web: <a href="https://github.com/daarulazmi-ponpes/twibbon-studio/tree/main/campaigns" target="_blank">twibbon-studio/campaigns</a><br>
+              4. Atau via Git: <code>git add campaigns/ && git commit -m "add cover" && git push</code>
             </div>
           </div>
 

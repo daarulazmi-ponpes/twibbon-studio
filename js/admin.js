@@ -5,10 +5,10 @@
 (function() {
   'use strict';
 
-  // Global variable for cover Base64
-  window.coverBase64 = '';
+  // Global variable for cover path
+  window.coverPath = '';
 
-  // Convert file to Base64
+  // Convert file to Base64 (for preview only)
   function fileToBase64(file) {
     return new Promise(function(resolve, reject) {
       const reader = new FileReader();
@@ -17,6 +17,37 @@
       };
       reader.onerror = reject;
       reader.readAsDataURL(file);
+    });
+  }
+
+  // Resize image to OG optimal size (1200x630 max)
+  function resizeImageForOG(base64, maxWidth, maxHeight, quality) {
+    return new Promise(function(resolve, reject) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to JPEG with quality
+        const resizedBase64 = canvas.toDataURL('image/jpeg', quality || 0.8);
+        resolve(resizedBase64);
+      };
+      img.onerror = reject;
+      img.src = base64;
     });
   }
 
@@ -206,7 +237,7 @@
     }
 
     // Reset cover
-    window.coverBase64 = '';
+    window.coverPath = '';
     const coverPreview = document.getElementById('cover-preview');
     if (coverPreview) {
       coverPreview.style.display = 'none';
@@ -326,12 +357,12 @@
     document.getElementById('campaign-start-date').value = campaign.startDate || '';
     document.getElementById('campaign-end-date').value = campaign.endDate || '';
 
-    // Set cover Base64 and preview
-    window.coverBase64 = campaign.cover || '';
+    // Set cover path and preview
+    window.coverPath = campaign.cover || '';
     const coverPreview = document.getElementById('cover-preview');
     const coverPreviewImg = document.getElementById('cover-preview-img');
-    if (window.coverBase64) {
-      coverPreviewImg.src = window.coverBase64;
+    if (window.coverPath) {
+      coverPreviewImg.src = window.coverPath;
       coverPreview.style.display = 'block';
     } else {
       coverPreview.style.display = 'none';
@@ -365,7 +396,7 @@
     const title = document.getElementById('campaign-title').value.trim();
     const description = document.getElementById('campaign-description').value.trim();
     const category = document.getElementById('campaign-category').value;
-    const cover = window.coverBase64 || '';
+    const cover = window.coverPath || '';
     const status = document.getElementById('campaign-status').value;
     const startDate = document.getElementById('campaign-start-date').value;
     const endDate = document.getElementById('campaign-end-date').value;
@@ -473,7 +504,7 @@
       btnAddFrame.addEventListener('click', addFrame);
     }
 
-    // Cover file upload
+    // Cover file upload - generates path suggestion
     if (coverFileInput) {
       coverFileInput.addEventListener('change', async function(e) {
         const file = e.target.files[0];
@@ -485,23 +516,38 @@
             return;
           }
 
-          // Validate file size (max 2MB)
-          if (file.size > 2 * 1024 * 1024) {
-            showNotification('Ukuran file terlalu besar. Maksimal 2MB', 'error');
+          // Validate file size (max 5MB for cover)
+          if (file.size > 5 * 1024 * 1024) {
+            showNotification('Ukuran file terlalu besar. Maksimal 5MB', 'error');
             e.target.value = '';
             return;
           }
 
           try {
             const base64 = await fileToBase64(file);
-            window.coverBase64 = base64;
+            
+            // Resize for OG if image is too large
+            let previewBase64 = base64;
+            if (file.size > 200 * 1024) {
+              previewBase64 = await resizeImageForOG(base64, 1200, 630, 0.8);
+            }
+
+            // Store the file name as path reference
+            const campaignId = document.getElementById('campaign-id').value || 'campaign-' + Date.now();
+            window.coverPath = 'campaigns/' + campaignId + '/cover.png';
             
             const coverPreview = document.getElementById('cover-preview');
             const coverPreviewImg = document.getElementById('cover-preview-img');
-            coverPreviewImg.src = base64;
+            coverPreviewImg.src = previewBase64;
             coverPreview.style.display = 'block';
             
-            showNotification('Cover berhasil diupload');
+            // Update path hint
+            const pathHint = document.getElementById('cover-path-hint');
+            if (pathHint) {
+              pathHint.textContent = window.coverPath;
+            }
+            
+            showNotification('Cover dipilih. Upload file ke: ' + window.coverPath);
           } catch (error) {
             showNotification('Gagal membaca gambar', 'error');
             e.target.value = '';
