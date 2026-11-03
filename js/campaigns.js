@@ -105,7 +105,7 @@ const CampaignsModule = (function() {
         <p class="campaign-card-text">${campaign.description}</p>
         <div class="campaign-card-footer">
           <span style="font-size: 0.85rem; color: #666;">${campaign.frames ? campaign.frames.length : 0} bingkai</span>
-          <a href="detail-kampanye.html?id=${campaign.id}" class="btn btn-primary btn-sm">Pilih Frame</a>
+          <a href="editor.html?campaign=${campaign.id}&frame=0" class="btn btn-primary btn-sm">Buat Twibbon</a>
         </div>
       </div>
     `;
