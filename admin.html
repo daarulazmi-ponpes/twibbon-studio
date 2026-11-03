@@ -450,11 +450,20 @@
         </div>
       </div>
 
+      <!-- Publish Alert -->
+      <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>⚠️ Penting:</strong> Kampanye yang Anda buat hanya tersimpan di browser ini.
+        Untuk agar semua pengunjung bisa melihat kampanye, klik tombol <strong>"📤 Publish ke GitHub"</strong> di bawah.
+      </div>
+
       <!-- Campaign Table -->
       <div class="admin-card">
         <div class="admin-card-header">
           <h2>Daftar Kampanye</h2>
-          <button class="btn btn-primary" id="btn-add-campaign">+ Tambah Kampanye</button>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-outline" id="btn-publish" style="background: #28a745; color: white; border-color: #28a745;">📤 Publish ke GitHub</button>
+            <button class="btn btn-primary" id="btn-add-campaign">+ Tambah Kampanye</button>
+          </div>
         </div>
 
         <div style="overflow-x: auto;">

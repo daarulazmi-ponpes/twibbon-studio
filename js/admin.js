@@ -83,7 +83,7 @@
     }
   }
 
-  // Load campaigns from localStorage or fallback to JSON file
+  // Load campaigns from localStorage (admin draft)
   function loadCampaigns() {
     const stored = localStorage.getItem('twibbon_campaigns');
     if (stored) {
@@ -92,10 +92,39 @@
     return null;
   }
 
-  // Save campaigns to localStorage
+  // Save campaigns to localStorage (admin draft)
   function saveCampaigns(campaigns) {
     localStorage.setItem('twibbon_campaigns', JSON.stringify(campaigns));
   }
+
+  // Publish campaigns - generates JSON file for Git commit
+  function publishCampaigns() {
+    const campaigns = loadCampaigns() || [];
+    
+    if (campaigns.length === 0) {
+      showNotification('Tidak ada kampanye untuk dipublish', 'error');
+      return;
+    }
+
+    // Generate JSON content
+    const jsonContent = JSON.stringify({ campaigns: campaigns }, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'campaigns.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showNotification('File campaigns.json berhasil didownload. Upload file ini ke repositori Git.');
+  }
+
+  // Make publish function available globally
+  window.publishCampaigns = publishCampaigns;
 
   // Fetch campaigns from JSON file
   async function fetchCampaignsFromJSON() {
@@ -480,11 +509,38 @@
     const btnCancel = document.getElementById('btn-cancel-modal');
     const btnSave = document.getElementById('btn-save-campaign');
     const btnAddFrame = document.getElementById('btn-add-frame');
+    const btnPublish = document.getElementById('btn-publish');
     const coverFileInput = document.getElementById('campaign-cover-file');
 
     if (btnAdd) {
       btnAdd.addEventListener('click', function() {
         openModal(false);
+      });
+    }
+
+    if (btnPublish) {
+      btnPublish.addEventListener('click', function() {
+        const campaigns = loadCampaigns() || [];
+        
+        if (campaigns.length === 0) {
+          showNotification('Tidak ada kampanye untuk dipublish', 'error');
+          return;
+        }
+
+        // Show publish instructions modal
+        const confirmed = confirm(
+          '📤 PUBLISH KAMPANYE\n\n' +
+          '1. File campaigns.json akan didownload ke komputer Anda\n' +
+          '2. Buka https://github.com/daarulazmi-ponpes/twibbon-studio/tree/main/data\n' +
+          '3. Klik "Upload files" dan pilih file campaigns.json yang didownload\n' +
+          '4. Klik "Commit changes" di bawah\n' +
+          '5. Tunggu 1-2 menit agar GitHub Pages rebuild\n\n' +
+          'Lanjutkan download file?'
+        );
+
+        if (confirmed) {
+          publishCampaigns();
+        }
       });
     }
 

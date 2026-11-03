@@ -7,22 +7,10 @@ const CampaignsModule = (function() {
 
   let campaignsData = null;
 
-  // Load campaigns from localStorage first, then fallback to JSON
+  // Load campaigns from JSON file (source of truth for all browsers)
   async function loadCampaigns() {
     if (campaignsData) return campaignsData;
     
-    // Check localStorage first (admin edits are stored here)
-    const stored = localStorage.getItem('twibbon_campaigns');
-    if (stored) {
-      try {
-        campaignsData = { campaigns: JSON.parse(stored) };
-        return campaignsData;
-      } catch (e) {
-        console.error('Error parsing localStorage campaigns:', e);
-      }
-    }
-    
-    // Fallback to JSON file
     try {
       const response = await fetch('data/campaigns.json?' + Date.now());
       if (!response.ok) throw new Error('Failed to load campaigns');
