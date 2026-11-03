@@ -7,6 +7,35 @@ const CampaignsModule = (function() {
 
   let campaignsData = null;
 
+  // Get base path for subdomain support
+  function getBasePath() {
+    const hostname = window.location.hostname;
+    if (hostname.includes('twibbon.daarulazmi')) {
+      return '';
+    }
+    return '/twibbon';
+  }
+
+  // Get full image URL with cache busting
+  function getImageUrl(path) {
+    if (!path) return '';
+    // External URLs (ImgBB) - use directly
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      // Add CORS parameter for ImgBB
+      if (path.includes('i.ibb.co')) {
+        return path + (path.includes('?') ? '&' : '?') + 'cors=true';
+      }
+      return path;
+    }
+    // Base64 images - return as-is
+    if (path.startsWith('data:')) {
+      return path;
+    }
+    // Relative paths - add base path and cache busting
+    const basePath = getBasePath();
+    return basePath + '/' + path + '?v=' + Date.now();
+  }
+
   // Load campaigns from JSON file (source of truth for all browsers)
   async function loadCampaigns() {
     if (campaignsData) return campaignsData;
@@ -15,6 +44,7 @@ const CampaignsModule = (function() {
       const response = await fetch('data/campaigns.json?' + Date.now());
       if (!response.ok) throw new Error('Failed to load campaigns');
       campaignsData = await response.json();
+      console.log('Campaigns loaded:', campaignsData.campaigns.length, 'campaigns');
       return campaignsData;
     } catch (error) {
       console.error('Error loading campaigns:', error);
@@ -59,8 +89,9 @@ const CampaignsModule = (function() {
       ? '<span class="badge badge-active">Aktif</span>'
       : '<span class="badge badge-inactive">Tidak Aktif</span>';
     
-    const coverHtml = campaign.cover 
-      ? `<img src="${campaign.cover}" alt="${campaign.title}" onerror="this.parentElement.innerHTML='<div class=\\'placeholder\\'>Cover belum tersedia</div>'">`
+    const coverUrl = getImageUrl(campaign.cover);
+    const coverHtml = coverUrl 
+      ? `<img src="${coverUrl}" alt="${campaign.title}" onerror="this.parentElement.innerHTML='<div class=\\'placeholder\\'>Cover belum tersedia</div>'">`
       : '<div class="placeholder">Cover belum tersedia</div>';
     
     card.innerHTML = `
@@ -73,7 +104,7 @@ const CampaignsModule = (function() {
         <p class="campaign-card-text">${campaign.description}</p>
         <div class="campaign-card-footer">
           <span style="font-size: 0.85rem; color: #666;">${campaign.frames ? campaign.frames.length : 0} bingkai</span>
-          <a href="frame.html?campaign=${campaign.id}" class="btn btn-primary btn-sm">Pilih Frame</a>
+          <a href="detail-kampanye.html?id=${campaign.id}" class="btn btn-primary btn-sm">Pilih Frame</a>
         </div>
       </div>
     `;

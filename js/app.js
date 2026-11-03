@@ -5,6 +5,10 @@
 const AppController = (function() {
   // Detect base path for subpath deployment (e.g., /twibbon/)
   function getBasePath() {
+    const hostname = window.location.hostname;
+    if (hostname.includes('twibbon.daarulazmi')) {
+      return '';
+    }
     const path = window.location.pathname;
     if (path.includes('/twibbon/')) {
       return '/twibbon';
@@ -19,7 +23,7 @@ const AppController = (function() {
       return relPath;
     }
     const basePath = getBasePath();
-    return basePath + '/' + relPath;
+    return basePath + '/' + relPath + '?v=' + Date.now();
   }
 
   // Initialize based on current page
@@ -63,32 +67,48 @@ const AppController = (function() {
 
   // Home page initialization
   async function initHomePage() {
-    // Load featured campaigns
+    console.log('Initializing home page...');
+    // Load featured campaigns (active only)
     const featuredContainer = document.getElementById('featured-campaigns');
     if (featuredContainer) {
-      const featured = await CampaignsManager.getFeaturedCampaigns();
+      const featured = await CampaignsModule.getActiveCampaigns();
+      console.log('Featured campaigns:', featured.length);
       if (featured.length > 0) {
-        featuredContainer.innerHTML = featured.map(c => CampaignsManager.renderCampaignCard(c)).join('');
+        featuredContainer.innerHTML = featured.map(c => CampaignsModule.renderCampaignCard(c)).join('');
       } else {
-        featuredContainer.innerHTML = '<p class="text-center text-gray">Belum ada kampanye unggulan.</p>';
+        featuredContainer.innerHTML = '<p class="text-center text-gray">Belum ada kampanye aktif.</p>';
       }
     }
 
-    // Load latest campaigns
+    // Load latest campaigns (active only)
     const latestContainer = document.getElementById('latest-campaigns');
     if (latestContainer) {
-      const campaigns = await CampaignsManager.getAllCampaigns();
+      const campaigns = await CampaignsModule.getActiveCampaigns();
       if (campaigns.length > 0) {
-        latestContainer.innerHTML = campaigns.map(c => CampaignsManager.renderCampaignCard(c)).join('');
+        latestContainer.innerHTML = campaigns.map(c => CampaignsModule.renderCampaignCard(c)).join('');
       }
     }
 
     // Load categories
     const categoriesContainer = document.getElementById('categories');
     if (categoriesContainer) {
-      const categories = await CampaignsManager.getCategories();
+      const data = await CampaignsModule.loadCampaigns();
+      const categories = [...new Set(data.campaigns.map(c => c.category))];
       if (categories.length > 0) {
-        categoriesContainer.innerHTML = categories.map(c => CampaignsManager.renderCategoryCard(c)).join('');
+        const categoryIcons = {
+          'harlah': '🎉',
+          'maulid': '🌙',
+          'wisuda': '🎓',
+          'islam': '☪️',
+          'ramadan': '🕌',
+          'ppdb': '📚'
+        };
+        categoriesContainer.innerHTML = categories.map(cat => `
+          <div class="category-card" data-category="${cat}" style="cursor:pointer;padding:1rem;text-align:center;border:1px solid #ddd;border-radius:8px;">
+            <div style="font-size:2rem;">${categoryIcons[cat] || '📌'}</div>
+            <div style="margin-top:0.5rem;">${cat.charAt(0).toUpperCase() + cat.slice(1)}</div>
+          </div>
+        `).join('');
         
         // Add click handler for category cards
         categoriesContainer.querySelectorAll('.category-card').forEach(card => {
@@ -103,40 +123,35 @@ const AppController = (function() {
 
   // Campaigns page initialization
   async function initCampaignsPage() {
+    console.log('Initializing campaigns page...');
     const campaignsList = document.getElementById('campaigns-list');
-    const emptyState = document.getElementById('empty-state');
+    const noResults = document.getElementById('no-results');
     const searchInput = document.getElementById('search-input');
-    const filterTagsContainer = document.getElementById('filter-tags');
+    const filterButtons = document.getElementById('filter-buttons');
     
     // Guard: only run if this is the campaigns page with required elements
-    if (!campaignsList || !emptyState) {
+    if (!campaignsList) {
+      console.log('Campaigns list container not found');
       return;
     }
     
-    let currentCategory = 'all';
+    let currentFilter = 'all';
     let currentSearch = '';
 
     // Load URL params
     const urlParams = new URLSearchParams(window.location.search);
     const urlCategory = urlParams.get('category');
     if (urlCategory) {
-      currentCategory = urlCategory;
+      currentFilter = urlCategory;
     }
 
-    // Load categories for filter tags
-    if (filterTagsContainer) {
-      const categories = await CampaignsManager.getCategories();
-      const tagsHTML = categories.map(c => 
-        `<button class="filter-tag ${currentCategory === c.id ? 'active' : ''}" data-category="${c.id}">${c.icon} ${c.name}</button>`
-      ).join('');
-      filterTagsContainer.innerHTML = `<button class="filter-tag ${currentCategory === 'all' ? 'active' : ''}" data-category="all">Semua</button>` + tagsHTML;
-
-      // Add click handlers
-      filterTagsContainer.querySelectorAll('.filter-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-          currentCategory = tag.dataset.category;
-          filterTagsContainer.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
-          tag.classList.add('active');
+    // Filter buttons click handlers
+    if (filterButtons) {
+      filterButtons.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentFilter = btn.dataset.filter;
+          filterButtons.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
           renderCampaigns();
         });
       });
@@ -147,23 +162,34 @@ const AppController = (function() {
       let campaigns;
       
       if (currentSearch) {
-        campaigns = await CampaignsManager.searchCampaigns(currentSearch);
-        // Also filter by category
-        if (currentCategory !== 'all') {
-          campaigns = campaigns.filter(c => c.category === currentCategory);
-        }
+        campaigns = await CampaignsModule.searchCampaigns(currentSearch);
       } else {
-        campaigns = await CampaignsManager.getCampaignsByCategory(currentCategory);
+        campaigns = await CampaignsModule.loadCampaigns();
+        campaigns = campaigns.campaigns || [];
       }
 
-      if (campaigns.length > 0) {
-        campaignsList.innerHTML = campaigns.map(c => CampaignsManager.renderCampaignCard(c)).join('');
-        campaignsList.style.display = 'grid';
-        emptyState.style.display = 'none';
-      } else {
-        campaignsList.style.display = 'none';
-        emptyState.style.display = 'block';
+      // Filter by status - only show active campaigns by default
+      if (currentFilter === 'active') {
+        campaigns = campaigns.filter(c => c.status === 'active');
+      } else if (currentFilter !== 'all') {
+        // Filter by category
+        campaigns = campaigns.filter(c => c.category === currentFilter);
       }
+
+      console.log('Rendering campaigns:', campaigns.length);
+      campaignsList.innerHTML = '';
+      
+      if (campaigns.length === 0) {
+        if (noResults) noResults.style.display = 'block';
+        return;
+      }
+      
+      if (noResults) noResults.style.display = 'none';
+      
+      campaigns.forEach(campaign => {
+        const card = CampaignsModule.renderCampaignCard(campaign);
+        campaignsList.appendChild(card);
+      });
     }
 
     // Initial render
@@ -182,8 +208,17 @@ const AppController = (function() {
     }
   }
 
+  // Format date helper
+  function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const d = new Date(dateStr);
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
   // Detail page initialization
   async function initDetailPage() {
+    console.log('Initializing detail page...');
     const urlParams = new URLSearchParams(window.location.search);
     const campaignId = urlParams.get('id');
     
@@ -192,12 +227,15 @@ const AppController = (function() {
       return;
     }
 
-    const campaign = await CampaignsManager.getCampaignById(campaignId);
+    const campaign = await CampaignsModule.getCampaignById(campaignId);
     
     if (!campaign) {
+      console.log('Campaign not found:', campaignId);
       showNotFound();
       return;
     }
+
+    console.log('Loaded campaign:', campaign.title);
 
     // Hide loading, show content
     document.getElementById('loading-state').style.display = 'none';
@@ -208,24 +246,18 @@ const AppController = (function() {
 
     // Update Open Graph tags for WhatsApp sharing
     if (window.updateOGTags) {
-      // For OG image, use the cover URL
-      // Priority: ImgBB URL > relative path > logo fallback
       let ogImage = 'https://twibbon.daarulazmi.ponpes.id/assets/logo/Darul-azmi-icon.png';
       
       if (campaign.cover) {
         if (campaign.cover.startsWith('data:')) {
-          // Base64 image - can't use in OG tags, use fallback
           ogImage = 'https://twibbon.daarulazmi.ponpes.id/assets/logo/Darul-azmi-icon.png';
         } else if (campaign.cover.startsWith('http://') || campaign.cover.startsWith('https://')) {
-          // External URL (ImgBB) - use directly
           ogImage = campaign.cover;
         } else {
-          // Relative path (campaigns/harlah/cover.png) - convert to full URL
           ogImage = 'https://twibbon.daarulazmi.ponpes.id/' + campaign.cover;
         }
       }
       
-      // Also update og:url for this specific campaign
       const setOG = (prop, content) => {
         let meta = document.querySelector(`meta[property="${prop}"]`);
         if (!meta) {
@@ -252,23 +284,16 @@ const AppController = (function() {
     // Set cover image with error handling
     const coverImg = document.getElementById('detail-cover');
     let coverUrl = campaign.cover || 'assets/images/placeholder-cover.png';
-    
-    // Apply base path for subpath deployment
     coverUrl = getImageUrl(coverUrl);
     
-    // For ImgBB URLs, add cors parameter
     if (coverUrl && coverUrl.includes('i.ibb.co')) {
       coverUrl = coverUrl + (coverUrl.includes('?') ? '&' : '?') + 'cors=true';
-    }
-    // Cache bust for local images to avoid stale service worker cache
-    if (coverUrl && !coverUrl.startsWith('http')) {
-      coverUrl = coverUrl + (coverUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
     }
     
     coverImg.src = coverUrl;
     coverImg.onerror = function() { 
       console.warn('Cover image failed to load, using placeholder');
-      this.src = getImageUrl('assets/images/placeholder-cover.png') + '?v=' + Date.now(); 
+      this.src = getImageUrl('assets/images/placeholder-cover.png'); 
     };
     
     // Status
@@ -282,29 +307,22 @@ const AppController = (function() {
     }
 
     // Meta
-    document.getElementById('detail-date').textContent = `${CampaignsManager.formatDate(campaign.startDate)} - ${CampaignsManager.formatDate(campaign.endDate)}`;
-    
-    const categoryName = await CampaignsManager.getCategoryName(campaign.category);
-    document.getElementById('detail-category').textContent = categoryName;
+    document.getElementById('detail-date').textContent = `${formatDate(campaign.startDate)} - ${formatDate(campaign.endDate)}`;
+    document.getElementById('detail-category').textContent = campaign.category.charAt(0).toUpperCase() + campaign.category.slice(1);
     document.getElementById('detail-popularity').textContent = `${campaign.popularity || 0}% populer`;
 
     // Frame selector
     const frameSelector = document.getElementById('frame-selector');
     if (campaign.frames && campaign.frames.length > 0) {
+      console.log('Loading frames:', campaign.frames.length);
       frameSelector.innerHTML = campaign.frames.map((frame, index) => {
-        // Apply base path for subpath deployment
         let frameUrl = getImageUrl(frame.thumbnail || frame.image);
-        // For ImgBB URLs, add cors parameter
         if (frameUrl && frameUrl.includes('i.ibb.co')) {
           frameUrl = frameUrl + (frameUrl.includes('?') ? '&' : '?') + 'cors=true';
         }
-        // Cache bust for local images to avoid stale service worker cache
-        if (frameUrl && !frameUrl.startsWith('http')) {
-          frameUrl = frameUrl + (frameUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
-        }
         return `
         <div class="frame-option ${index === 0 ? 'selected' : ''}" data-index="${index}">
-          <img src="${frameUrl}" alt="${frame.name}" onerror="this.src='${getImageUrl('assets/images/placeholder-frame.png')}?v=' + Date.now()">
+          <img src="${frameUrl}" alt="${frame.name}" onerror="this.src='${getImageUrl('assets/images/placeholder-frame.png')}'">
           <p style="font-size: var(--font-size-xs); text-align: center; margin-top: var(--spacing-xs);">${frame.name}</p>
         </div>
       `;
