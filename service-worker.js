@@ -2,13 +2,16 @@
    DAARUL AZMI TWIBBON STUDIO - Service Worker
    ============================================ */
 
-const CACHE_NAME = 'twibbon-studio-v1';
+const CACHE_NAME = 'twibbon-studio-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './kampanye.html',
+  './frame.html',
   './editor.html',
   './panduan.html',
+  './login.html',
+  './admin.html',
   './css/global.css',
   './css/layout.css',
   './css/mobile.css',
@@ -17,6 +20,7 @@ const ASSETS_TO_CACHE = [
   './js/campaigns.js',
   './js/canvas-engine.js',
   './js/editor.js',
+  './js/admin.js',
   './js/download.js',
   './data/campaigns.json',
   './manifest.json',
