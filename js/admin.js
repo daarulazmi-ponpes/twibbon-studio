@@ -5,6 +5,21 @@
 (function() {
   'use strict';
 
+  // Global variable for cover Base64
+  window.coverBase64 = '';
+
+  // Convert file to Base64
+  function fileToBase64(file) {
+    return new Promise(function(resolve, reject) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        resolve(e.target.result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   // Check authentication
   function checkAuth() {
     if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
@@ -190,6 +205,13 @@
       form.reset();
     }
 
+    // Reset cover
+    window.coverBase64 = '';
+    const coverPreview = document.getElementById('cover-preview');
+    if (coverPreview) {
+      coverPreview.style.display = 'none';
+    }
+
     document.getElementById('campaign-id').value = '';
     currentFrames = [];
     renderFrameList();
@@ -212,14 +234,62 @@
     currentFrames.forEach(function(frame, index) {
       const frameItem = document.createElement('div');
       frameItem.className = 'frame-item';
+      
+      const previewContent = frame.image 
+        ? `<img src="${frame.image}" alt="Preview">`
+        : '<div class="placeholder">Belum ada gambar</div>';
+
       frameItem.innerHTML = `
-        <div style="flex: 1;">
-          <input type="text" class="form-control frame-name" value="${escapeHtml(frame.name || '')}" placeholder="Nama bingkai" style="margin-bottom: 0.5rem;">
-          <input type="text" class="form-control frame-image" value="${escapeHtml(frame.image || '')}" placeholder="URL gambar bingkai" style="font-size: 0.875rem;">
+        <div class="frame-item-header">
+          <strong>Bingkai #${index + 1}</strong>
+          <button type="button" class="btn-remove-frame" onclick="removeFrame(${index})" title="Hapus bingkai">&times;</button>
         </div>
-        <button type="button" class="btn-remove-frame" onclick="removeFrame(${index})" title="Hapus bingkai">&times;</button>
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <div class="frame-item-preview">
+            ${previewContent}
+          </div>
+          <div style="flex: 1;">
+            <input type="text" class="form-control frame-name" data-index="${index}" value="${escapeHtml(frame.name || '')}" placeholder="Nama bingkai" style="margin-bottom: 0.5rem;">
+            <div class="frame-upload-area">
+              <input type="file" class="frame-file-input" data-index="${index}" accept="image/png,image/jpeg,image/webp">
+            </div>
+            <small style="color: var(--dark-gray);">Pilih gambar PNG transparan dari galeri</small>
+          </div>
+        </div>
       `;
       frameList.appendChild(frameItem);
+
+      // Add event listener for file upload
+      const fileInput = frameItem.querySelector('.frame-file-input');
+      fileInput.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          // Validate file type
+          if (!file.type.match('image/(png|jpeg|webp)')) {
+            showNotification('Format file tidak didukung. Gunakan PNG, JPG, atau WebP', 'error');
+            e.target.value = '';
+            return;
+          }
+
+          // Validate file size (max 2MB)
+          if (file.size > 2 * 1024 * 1024) {
+            showNotification('Ukuran file terlalu besar. Maksimal 2MB', 'error');
+            e.target.value = '';
+            return;
+          }
+
+          try {
+            const base64 = await fileToBase64(file);
+            currentFrames[index].image = base64;
+            const preview = frameItem.querySelector('.frame-item-preview');
+            preview.innerHTML = `<img src="${base64}" alt="Preview">`;
+            showNotification('Gambar bingkai berhasil diupload');
+          } catch (error) {
+            showNotification('Gagal membaca gambar', 'error');
+            e.target.value = '';
+          }
+        }
+      });
     });
   }
 
@@ -252,10 +322,20 @@
     document.getElementById('campaign-title').value = campaign.title || '';
     document.getElementById('campaign-description').value = campaign.description || '';
     document.getElementById('campaign-category').value = campaign.category || '';
-    document.getElementById('campaign-cover').value = campaign.cover || '';
     document.getElementById('campaign-status').value = campaign.status || 'active';
     document.getElementById('campaign-start-date').value = campaign.startDate || '';
     document.getElementById('campaign-end-date').value = campaign.endDate || '';
+
+    // Set cover Base64 and preview
+    window.coverBase64 = campaign.cover || '';
+    const coverPreview = document.getElementById('cover-preview');
+    const coverPreviewImg = document.getElementById('cover-preview-img');
+    if (window.coverBase64) {
+      coverPreviewImg.src = window.coverBase64;
+      coverPreview.style.display = 'block';
+    } else {
+      coverPreview.style.display = 'none';
+    }
 
     // Load frames
     currentFrames = campaign.frames ? JSON.parse(JSON.stringify(campaign.frames)) : [];
@@ -280,12 +360,12 @@
   };
 
   // Save campaign
-  function saveCampaign() {
+  async function saveCampaign() {
     const id = document.getElementById('campaign-id').value;
     const title = document.getElementById('campaign-title').value.trim();
     const description = document.getElementById('campaign-description').value.trim();
     const category = document.getElementById('campaign-category').value;
-    const cover = document.getElementById('campaign-cover').value.trim();
+    const cover = window.coverBase64 || '';
     const status = document.getElementById('campaign-status').value;
     const startDate = document.getElementById('campaign-start-date').value;
     const endDate = document.getElementById('campaign-end-date').value;
@@ -296,14 +376,13 @@
       return;
     }
 
-    // Collect frames
+    // Collect frames from currentFrames array (already contains Base64)
     const frameNames = document.querySelectorAll('.frame-name');
-    const frameImages = document.querySelectorAll('.frame-image');
     const frames = [];
 
     frameNames.forEach(function(nameInput, index) {
       const name = nameInput.value.trim();
-      const image = frameImages[index].value.trim();
+      const image = currentFrames[index] ? currentFrames[index].image : '';
       if (name && image) {
         frames.push({ name: name, image: image });
       }
@@ -370,6 +449,7 @@
     const btnCancel = document.getElementById('btn-cancel-modal');
     const btnSave = document.getElementById('btn-save-campaign');
     const btnAddFrame = document.getElementById('btn-add-frame');
+    const coverFileInput = document.getElementById('campaign-cover-file');
 
     if (btnAdd) {
       btnAdd.addEventListener('click', function() {
@@ -391,6 +471,43 @@
 
     if (btnAddFrame) {
       btnAddFrame.addEventListener('click', addFrame);
+    }
+
+    // Cover file upload
+    if (coverFileInput) {
+      coverFileInput.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          // Validate file type
+          if (!file.type.match('image/(png|jpeg|webp)')) {
+            showNotification('Format file tidak didukung. Gunakan PNG, JPG, atau WebP', 'error');
+            e.target.value = '';
+            return;
+          }
+
+          // Validate file size (max 2MB)
+          if (file.size > 2 * 1024 * 1024) {
+            showNotification('Ukuran file terlalu besar. Maksimal 2MB', 'error');
+            e.target.value = '';
+            return;
+          }
+
+          try {
+            const base64 = await fileToBase64(file);
+            window.coverBase64 = base64;
+            
+            const coverPreview = document.getElementById('cover-preview');
+            const coverPreviewImg = document.getElementById('cover-preview-img');
+            coverPreviewImg.src = base64;
+            coverPreview.style.display = 'block';
+            
+            showNotification('Cover berhasil diupload');
+          } catch (error) {
+            showNotification('Gagal membaca gambar', 'error');
+            e.target.value = '';
+          }
+        }
+      });
     }
 
     // Close modal on overlay click

@@ -310,14 +310,47 @@
 
     .frame-item {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--spacing-xs) 0;
-      border-bottom: 1px solid var(--gray);
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: var(--spacing-sm);
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      background: #f9f9f9;
     }
 
     .frame-item:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .frame-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .frame-item-preview {
+      width: 100px;
+      height: 100px;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: white;
+    }
+
+    .frame-item-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .frame-item-preview .placeholder {
+      color: #999;
+      font-size: 0.8rem;
+      text-align: center;
     }
 
     .btn-remove-frame {
@@ -326,6 +359,16 @@
       color: #dc3545;
       cursor: pointer;
       font-size: 1.2rem;
+    }
+
+    .frame-upload-area {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .frame-upload-area input[type="file"] {
+      font-size: 0.875rem;
     }
 
     @media (max-width: 768px) {
@@ -472,9 +515,13 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="campaign-cover">URL Cover Image <span style="color: #999;">(opsional)</span></label>
-            <input type="text" class="form-control" id="campaign-cover" placeholder="campaigns/kategori/cover.png">
-            <small style="color: var(--dark-gray);">Contoh: campaigns/harlah/cover.png</small>
+            <label class="form-label" for="campaign-cover">Upload Cover <span style="color: #999;">(opsional)</span></label>
+            <input type="file" class="form-control" id="campaign-cover-file" accept="image/png,image/jpeg,image/webp">
+            <small style="color: var(--dark-gray);">Pilih gambar dari galeri atau file (PNG, JPG, WebP)</small>
+            <div id="cover-preview" style="margin-top: 0.5rem; display: none;">
+              <img id="cover-preview-img" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid #ddd;">
+              <button type="button" class="btn btn-sm" style="margin-left: 0.5rem; background: #dc3545; color: white;" onclick="document.getElementById('campaign-cover-file').value=''; document.getElementById('cover-preview').style.display='none'; window.coverBase64='';">Hapus</button>
+            </div>
           </div>
 
           <div class="form-group">
@@ -500,6 +547,9 @@
             <label class="form-label">Bingkai (Frames)</label>
             <div class="frame-list" id="frame-list">
               <!-- Frame items will be added here -->
+            </div>
+            <div style="background: #fff3cd; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.875rem; color: #856404;">
+              <strong>💡 Tips:</strong> Upload gambar bingkai PNG transparan. Area tengah sebaiknya kosong agar foto terlihat.
             </div>
             <button type="button" class="btn btn-outline btn-sm" id="btn-add-frame" style="margin-top: var(--spacing-sm);">+ Tambah Bingkai</button>
           </div>
