@@ -23,7 +23,8 @@ const AppController = (function() {
       return relPath;
     }
     const basePath = getBasePath();
-    return basePath + '/' + relPath + '?v=' + Date.now();
+    const cleanPath = basePath ? basePath + '/' + relPath : relPath;
+    return cleanPath + '?v=' + Date.now();
   }
 
   // Initialize based on current page
@@ -73,19 +74,28 @@ const AppController = (function() {
     if (featuredContainer) {
       const featured = await CampaignsModule.getActiveCampaigns();
       console.log('Featured campaigns:', featured.length);
+      featuredContainer.innerHTML = '';
       if (featured.length > 0) {
-        featuredContainer.innerHTML = featured.map(c => CampaignsModule.renderCampaignCard(c)).join('');
+        featured.forEach(campaign => {
+          const card = CampaignsModule.renderCampaignCard(campaign);
+          featuredContainer.appendChild(card);
+        });
       } else {
         featuredContainer.innerHTML = '<p class="text-center text-gray">Belum ada kampanye aktif.</p>';
       }
     }
 
-    // Load latest campaigns (active only)
-    const latestContainer = document.getElementById('latest-campaigns');
-    if (latestContainer) {
+    // Load all campaigns for home page
+    const allContainer = document.getElementById('all-campaigns');
+    if (allContainer) {
       const campaigns = await CampaignsModule.getActiveCampaigns();
+      console.log('All campaigns on home:', campaigns.length);
+      allContainer.innerHTML = '';
       if (campaigns.length > 0) {
-        latestContainer.innerHTML = campaigns.map(c => CampaignsModule.renderCampaignCard(c)).join('');
+        campaigns.forEach(campaign => {
+          const card = CampaignsModule.renderCampaignCard(campaign);
+          allContainer.appendChild(card);
+        });
       }
     }
 
@@ -192,20 +202,20 @@ const AppController = (function() {
       });
     }
 
-    // Initial render
-    await renderCampaigns();
-
-    // Search handler
+    // Search input handler
     if (searchInput) {
-      let searchTimeout;
-      searchInput.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-          currentSearch = e.target.value.trim();
+      let timeout;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(timeout);
+        currentSearch = searchInput.value.trim();
+        timeout = setTimeout(() => {
           renderCampaigns();
         }, 300);
       });
     }
+
+    // Initial render
+    renderCampaigns();
   }
 
   // Format date helper

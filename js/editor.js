@@ -35,7 +35,8 @@ const EditorModule = (function() {
     }
     // Relative paths - add base path and cache busting
     const basePath = getBasePath();
-    return basePath + '/' + path + '?v=' + Date.now();
+    const cleanPath = basePath ? basePath + '/' + path : path;
+    return cleanPath + '?v=' + Date.now();
   }
 
   // Initialize editor page
