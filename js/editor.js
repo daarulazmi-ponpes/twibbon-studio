@@ -9,6 +9,35 @@ const EditorModule = (function() {
   let currentFrameIndex = 0;
   let currentFile = null;
 
+  // Get base path for subdomain support
+  function getBasePath() {
+    const hostname = window.location.hostname;
+    if (hostname.includes('twibbon.daarulazmi')) {
+      return '';
+    }
+    return '/twibbon';
+  }
+
+  // Get full image URL with cache busting
+  function getImageUrl(path) {
+    if (!path) return '';
+    // External URLs (ImgBB) - use directly
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      // Add CORS parameter for ImgBB
+      if (path.includes('i.ibb.co')) {
+        return path + (path.includes('?') ? '&' : '?') + 'cors=true';
+      }
+      return path;
+    }
+    // Base64 images - return as-is
+    if (path.startsWith('data:')) {
+      return path;
+    }
+    // Relative paths - add base path and cache busting
+    const basePath = getBasePath();
+    return basePath + '/' + path + '?v=' + Date.now();
+  }
+
   // Initialize editor page
   async function init() {
     // Check if this is the editor page
@@ -99,8 +128,9 @@ const EditorModule = (function() {
       const option = document.createElement('div');
       option.className = 'frame-option-editor' + (index === currentFrameIndex ? ' selected' : '');
       
-      const imgHtml = frame.image 
-        ? `<img src="${frame.image}" alt="${frame.name}" onerror="this.style.display='none'">`
+      const frameUrl = getImageUrl(frame.image);
+      const imgHtml = frameUrl
+        ? `<img src="${frameUrl}" alt="${frame.name}" onerror="this.style.display='none'">`
         : '<div style="width:100%;height:80px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:0.8rem;">DEMO</div>';
       
       option.innerHTML = `
@@ -136,7 +166,10 @@ const EditorModule = (function() {
     
     if (frame.image) {
       try {
-        await CanvasEngine.loadFrame(frame.image);
+        const frameUrl = getImageUrl(frame.image);
+        console.log('Loading frame image:', frameUrl);
+        await CanvasEngine.loadFrame(frameUrl);
+        console.log('Frame image loaded successfully');
       } catch (error) {
         console.error('Error loading frame:', error);
         showNotification('Gagal memuat bingkai, menggunakan mode DEMO', 'error');

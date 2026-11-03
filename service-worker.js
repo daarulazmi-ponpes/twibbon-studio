@@ -2,7 +2,7 @@
    DAARUL AZMI TWIBBON STUDIO - Service Worker
    ============================================ */
 
-const CACHE_NAME = 'twibbon-studio-v12';
+const CACHE_NAME = 'twibbon-studio-v13';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
