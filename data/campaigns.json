@@ -1,114 +1,62 @@
 {
   "campaigns": [
     {
-      "id": "harlah-ke-4",
-      "title": "Harlah Pondok Pesantren Daarul Azmi Ke-4",
-      "description": "Rayakan bersama Harlah Pondok Pesantren Daarul Azmi ke-4. Gunakan bingkai spesial ini untuk menunjukkan semangat dan kebanggaan Anda!",
-      "category": "harlah",
-      "cover": "assets/images/campaigns/harlah/cover.png",
-      "status": "active",
-      "startDate": "2026-11-01",
-      "endDate": "2026-11-30",
-      "frames": [
-        {
-          "name": "Frame Harlah Emas",
-          "image": "assets/images/campaigns/harlah/frame-1.png"
-        },
-        {
-          "name": "Frame Harlah Hijau",
-          "image": "assets/images/campaigns/harlah/frame-2.png"
-        }
-      ]
-    },
-    {
-      "id": "maulid-nabi",
-      "title": "Maulid Nabi Muhammad SAW 1448 H",
-      "description": "Peringati Maulid Nabi Muhammad SAW dengan bingkai spesial. Sebarkan cinta dan kasih sayang Rasulullah SAW.",
-      "category": "maulid",
-      "cover": "assets/images/campaigns/maulid/cover.png",
-      "status": "active",
-      "startDate": "2026-09-01",
-      "endDate": "2026-09-30",
-      "frames": [
-        {
-          "name": "Frame Maulid",
-          "image": "assets/images/campaigns/maulid/frame-1.png"
-        }
-      ]
-    },
-    {
-      "id": "wisuda-santri",
-      "title": "Wisuda Santri Daarul Azmi 2026",
-      "description": "Selamatkan para santri yang telah menyelesaikan studinya di Pondok Pesantren Daarul Azmi.",
-      "category": "wisuda",
-      "cover": "assets/images/campaigns/wisuda/cover.png",
-      "status": "inactive",
-      "startDate": "2026-06-01",
-      "endDate": "2026-06-30",
-      "frames": [
-        {
-          "name": "Frame Wisuda",
-          "image": "assets/images/campaigns/wisuda/frame-1.png"
-        }
-      ]
-    },
-    {
-      "id": "tahun-baruislam",
-      "title": "Tahun Baru Islam 1448 H",
-      "description": "Selamat Tahun Baru Islam 1448 H. Mari bersama-sama meningkatkan semangat beribadah dan belajar.",
-      "category": "islam",
-      "cover": "assets/images/campaigns/islam/cover.png",
-      "status": "inactive",
-      "startDate": "2026-07-01",
-      "endDate": "2026-07-31",
-      "frames": [
-        {
-          "name": "Frame Tahun Baru Islam",
-          "image": "assets/images/campaigns/islam/frame-1.png"
-        }
-      ]
-    },
-    {
-      "id": "ramadan",
-      "title": "Ramadan 1448 H",
-      "description": "Sambut bulan suci Ramadan dengan penuh kegembiraan. Gunakan bingkai Ramadan ini untuk berbagi semangat ibadah.",
-      "category": "ramadan",
-      "cover": "assets/images/campaigns/ramadan/cover.png",
-      "status": "inactive",
-      "startDate": "2026-03-01",
-      "endDate": "2026-03-31",
-      "frames": [
-        {
-          "name": "Frame Ramadan",
-          "image": "assets/images/campaigns/ramadan/frame-1.png"
-        }
-      ]
-    },
-    {
-      "id": "ppdb-2026",
-      "title": "PPDB Daarul Azmi 2026",
-      "description": "Penerimaan Peserta Didik Baru Pondok Pesantren Daarul Azmi tahun 2026. Daftarkan diri Anda sekarang!",
-      "category": "ppdb",
-      "cover": "assets/images/campaigns/ppdb/cover.png",
-      "status": "inactive",
-      "startDate": "2026-01-01",
-      "endDate": "2026-12-31",
-      "frames": [
-        {
-          "name": "Frame PPDB",
-          "image": "assets/images/campaigns/ppdb/frame-1.png"
-        }
-      ]
-    },
-    {
-      "id": "campaign-1793701532693",
-      "title": "harlah",
+      "id": "campaign-1793698997507",
+      "title": "Harlah",
       "description": "🌿 **MENEGUHKAN TEKAD, MENGUATKAN HIDMAT** 🌿\n\nDalam rangka memperingati **Harlah ke-4 Pondok Pesantren Daarul Azmi**, mari bersama-sama merayakan perjalanan khidmat, perjuangan, dan pengabdian dalam membangun generasi Qur'ani yang berilmu, berakhlak mulia, dan bermanfaat bagi umat.\n\nEmpat tahun bukan sekadar perjalanan waktu, melainkan jejak perjuangan, ketulusan, dan doa dari para masyayikh, asatidz, santri, wali santri, serta seluruh keluarga besar Daarul Azmi.\n\nMari tunjukkan rasa syukur, cinta, dan kebanggaan kita dengan menggunakan Twibbon Harlah ke-4 Daarul Azmi.\n\n💚 **Meneguhkan Tekad, Menguatkan Hidmat**\nBersama melangkah, merawat perjuangan, dan melanjutkan khidmat untuk agama, bangsa, dan umat.\n\n**Selamat Harlah ke-4 Pondok Pesantren Daarul Azmi!**\n\n#HarlahKe4DaarulAzmi\n#MeneguhkanTekadMenguatkanHidmat\n#KeluargaBesarDaarulAzmi\n#DaarulAzmiMengabdi",
       "category": "harlah",
-      "cover": "assets/images/campaigns/campaign-1793701532693/cover.png",
+      "cover": "assets/images/campaigns/campaign-1793698997507/cover.png",
       "status": "active",
       "startDate": "2026-11-03",
       "endDate": "2026-11-09",
+      "frames": [
+        {
+          "name": "harlah",
+          "image": "assets/images/campaigns/campaign-1793698997507/frame-1.png"
+        }
+      ]
+    },
+    {
+      "id": "campaign-1793699861221",
+      "title": "Harlah",
+      "description": "🌿 **MENEGUHKAN TEKAD, MENGUATKAN HIDMAT** 🌿\n\nDalam rangka memperingati **Harlah ke-4 Pondok Pesantren Daarul Azmi**, mari bersama-sama merayakan perjalanan khidmat, perjuangan, dan pengabdian dalam membangun generasi Qur'ani yang berilmu, berakhlak mulia, dan bermanfaat bagi umat.\n\nEmpat tahun bukan sekadar perjalanan waktu, melainkan jejak perjuangan, ketulusan, dan doa dari para masyayikh, asatidz, santri, wali santri, serta seluruh keluarga besar Daarul Azmi.\n\nMari tunjukkan rasa syukur, cinta, dan kebanggaan kita dengan menggunakan Twibbon Harlah ke-4 Daarul Azmi.\n\n💚 **Meneguhkan Tekad, Menguatkan Hidmat**\nBersama melangkah, merawat perjuangan, dan melanjutkan khidmat untuk agama, bangsa, dan umat.\n\n**Selamat Harlah ke-4 Pondok Pesantren Daarul Azmi!**\n\n#HarlahKe4DaarulAzmi\n#MeneguhkanTekadMenguatkanHidmat\n#KeluargaBesarDaarulAzmi\n#DaarulAzmiMengabdi",
+      "category": "harlah",
+      "cover": "assets/images/campaigns/campaign-1793699861221/cover.png",
+      "status": "active",
+      "startDate": "2026-11-03",
+      "endDate": "2026-11-09",
+      "frames": [
+        {
+          "name": "harlah",
+          "image": "assets/images/campaigns/campaign-1793699861221/frame-1.png"
+        }
+      ]
+    },
+    {
+      "id": "campaign-1793699898042",
+      "title": "Harlah",
+      "description": "🌿 **MENEGUHKAN TEKAD, MENGUATKAN HIDMAT** 🌿\n\nDalam rangka memperingati **Harlah ke-4 Pondok Pesantren Daarul Azmi**, mari bersama-sama merayakan perjalanan khidmat, perjuangan, dan pengabdian dalam membangun generasi Qur'ani yang berilmu, berakhlak mulia, dan bermanfaat bagi umat.\n\nEmpat tahun bukan sekadar perjalanan waktu, melainkan jejak perjuangan, ketulusan, dan doa dari para masyayikh, asatidz, santri, wali santri, serta seluruh keluarga besar Daarul Azmi.\n\nMari tunjukkan rasa syukur, cinta, dan kebanggaan kita dengan menggunakan Twibbon Harlah ke-4 Daarul Azmi.\n\n💚 **Meneguhkan Tekad, Menguatkan Hidmat**\nBersama melangkah, merawat perjuangan, dan melanjutkan khidmat untuk agama, bangsa, dan umat.\n\n**Selamat Harlah ke-4 Pondok Pesantren Daarul Azmi!**\n\n#HarlahKe4DaarulAzmi\n#MeneguhkanTekadMenguatkanHidmat\n#KeluargaBesarDaarulAzmi\n#DaarulAzmiMengabdi",
+      "category": "harlah",
+      "cover": "assets/images/campaigns/campaign-1793699898042/cover.png",
+      "status": "active",
+      "startDate": "2026-11-03",
+      "endDate": "2026-11-09",
+      "frames": [
+        {
+          "name": "harlah4",
+          "image": "assets/images/campaigns/campaign-1793699898042/frame-1.png"
+        }
+      ]
+    },
+    {
+      "id": "campaign-1793699923443",
+      "title": "Harlah",
+      "description": "🌿 **MENEGUHKAN TEKAD, MENGUATKAN HIDMAT** 🌿\n\nDalam rangka memperingati **Harlah ke-4 Pondok Pesantren Daarul Azmi**, mari bersama-sama merayakan perjalanan khidmat, perjuangan, dan pengabdian dalam membangun generasi Qur'ani yang berilmu, berakhlak mulia, dan bermanfaat bagi umat.\n\nEmpat tahun bukan sekadar perjalanan waktu, melainkan jejak perjuangan, ketulusan, dan doa dari para masyayikh, asatidz, santri, wali santri, serta seluruh keluarga besar Daarul Azmi.\n\nMari tunjukkan rasa syukur, cinta, dan kebanggaan kita dengan menggunakan Twibbon Harlah ke-4 Daarul Azmi.\n\n💚 **Meneguhkan Tekad, Menguatkan Hidmat**\nBersama melangkah, merawat perjuangan, dan melanjutkan khidmat untuk agama, bangsa, dan umat.\n\n**Selamat Harlah ke-4 Pondok Pesantren Daarul Azmi!**\n\n#HarlahKe4DaarulAzmi\n#MeneguhkanTekadMenguatkanHidmat\n#KeluargaBesarDaarulAzmi\n#DaarulAzmiMengabdi",
+      "category": "harlah",
+      "cover": "assets/images/campaigns/campaign-1793699923443/cover.png",
+      "status": "active",
+      "startDate": "",
+      "endDate": "",
       "frames": []
     }
   ]
