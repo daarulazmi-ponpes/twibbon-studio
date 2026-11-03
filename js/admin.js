@@ -181,6 +181,11 @@
     const token = getGitHubToken();
     const url = `${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/${path}`;
 
+    // Validate base64 content before sending
+    if (!isValidBase64(content)) {
+      throw new Error('Content bukan valid Base64 untuk file: ' + path);
+    }
+
     const body = {
       message: message,
       content: content,
@@ -202,8 +207,16 @@
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || `Failed to create file: ${response.status}`);
+      const errorText = await response.text();
+      let errorMessage = `Failed to create file: ${response.status}`;
+      try {
+        const error = JSON.parse(errorText);
+        errorMessage = error.message || error.error || errorMessage;
+      } catch (e) {
+        // If response is not JSON, use status text
+        errorMessage = `Failed to create file: ${response.status} ${response.statusText}`;
+      }
+      throw new Error(errorMessage);
     }
 
     return await response.json();
@@ -220,11 +233,41 @@
     return new Blob([ab], { type: mimeType });
   }
 
-  // Get image MIME type from base64
-  function getImageMimeType(base64) {
-    if (base64.startsWith('data:image/png')) return 'image/png';
-    if (base64.startsWith('data:image/webp')) return 'image/webp';
-    if (base64.startsWith('data:image/jpeg')) return 'image/jpeg';
+  // Extract pure base64 from data URI
+  function extractBase64(dataUri) {
+    if (!dataUri) return '';
+    
+    // Remove data URI prefix (e.g., "data:image/png;base64,")
+    let base64 = dataUri;
+    const commaIndex = dataUri.indexOf(',');
+    if (commaIndex > -1) {
+      base64 = dataUri.substring(commaIndex + 1);
+    }
+    
+    // Remove whitespace, newlines, and other invalid characters
+    base64 = base64.replace(/[\s\r\n]/g, '');
+    
+    // Validate base64 characters
+    if (!/^[A-Za-z0-9+/]+=*$/.test(base64)) {
+      console.error('Invalid base64 characters detected');
+      return '';
+    }
+    
+    return base64;
+  }
+
+  // Validate base64 string
+  function isValidBase64(str) {
+    if (!str) return false;
+    return /^[A-Za-z0-9+/]+=*$/.test(str) && str.length > 0;
+  }
+
+  // Get image MIME type from data URI
+  function getImageMimeType(dataUri) {
+    if (!dataUri) return 'image/png';
+    if (dataUri.includes('image/png')) return 'image/png';
+    if (dataUri.includes('image/webp')) return 'image/webp';
+    if (dataUri.includes('image/jpeg') || dataUri.includes('image/jpg')) return 'image/jpeg';
     return 'image/png';
   }
 
@@ -289,16 +332,22 @@
           const coverPath = campaignFolder + '/cover.' + ext;
 
           try {
+            const pureBase64 = extractBase64(campaign.cover);
+            if (!isValidBase64(pureBase64)) {
+              throw new Error('Base64 tidak valid untuk cover image');
+            }
+            
             const existing = await getGitHubFile(coverPath);
             const sha = existing ? existing.sha : null;
             await createOrUpdateFile(
               coverPath,
-              campaign.cover.replace(/^data:image\/\w+;base64,/, ''),
+              pureBase64,
               `Deploy cover: ${campaign.title}`,
               sha
             );
           } catch (error) {
             console.error('Failed to upload cover:', error);
+            throw new Error('Gagal upload cover: ' + error.message);
           }
 
           progress = Math.round(((i + 1) / totalFiles) * 50);
@@ -317,16 +366,22 @@
               const framePath = campaignFolder + '/frame-' + (j + 1) + '.' + ext;
 
               try {
+                const pureBase64 = extractBase64(frame.image);
+                if (!isValidBase64(pureBase64)) {
+                  throw new Error('Base64 tidak valid untuk frame image');
+                }
+                
                 const existing = await getGitHubFile(framePath);
                 const sha = existing ? existing.sha : null;
                 await createOrUpdateFile(
                   framePath,
-                  frame.image.replace(/^data:image\/\w+;base64,/, ''),
+                  pureBase64,
                   `Deploy frame: ${campaign.title} - ${frame.name}`,
                   sha
                 );
               } catch (error) {
                 console.error('Failed to upload frame:', error);
+                throw new Error('Gagal upload frame: ' + error.message);
               }
 
               progress = Math.round(((i * campaign.frames.length + j + 1) / totalFiles) * 50);
