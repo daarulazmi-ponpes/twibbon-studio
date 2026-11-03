@@ -49,15 +49,20 @@
       ]
     },
     {
-      "id": "campaign-1793699923443",
+      "id": "campaign-1793703104801",
       "title": "Harlah",
       "description": "🌿 **MENEGUHKAN TEKAD, MENGUATKAN HIDMAT** 🌿\n\nDalam rangka memperingati **Harlah ke-4 Pondok Pesantren Daarul Azmi**, mari bersama-sama merayakan perjalanan khidmat, perjuangan, dan pengabdian dalam membangun generasi Qur'ani yang berilmu, berakhlak mulia, dan bermanfaat bagi umat.\n\nEmpat tahun bukan sekadar perjalanan waktu, melainkan jejak perjuangan, ketulusan, dan doa dari para masyayikh, asatidz, santri, wali santri, serta seluruh keluarga besar Daarul Azmi.\n\nMari tunjukkan rasa syukur, cinta, dan kebanggaan kita dengan menggunakan Twibbon Harlah ke-4 Daarul Azmi.\n\n💚 **Meneguhkan Tekad, Menguatkan Hidmat**\nBersama melangkah, merawat perjuangan, dan melanjutkan khidmat untuk agama, bangsa, dan umat.\n\n**Selamat Harlah ke-4 Pondok Pesantren Daarul Azmi!**\n\n#HarlahKe4DaarulAzmi\n#MeneguhkanTekadMenguatkanHidmat\n#KeluargaBesarDaarulAzmi\n#DaarulAzmiMengabdi",
       "category": "harlah",
-      "cover": "assets/images/campaigns/campaign-1793699923443/cover.png",
+      "cover": "assets/images/campaigns/campaign-1793703104801/cover.png",
       "status": "active",
-      "startDate": "",
-      "endDate": "",
-      "frames": []
+      "startDate": "2026-11-03",
+      "endDate": "2026-11-09",
+      "frames": [
+        {
+          "name": "harlah-4",
+          "image": "assets/images/campaigns/campaign-1793703104801/frame-1.png"
+        }
+      ]
     }
   ]
 }
