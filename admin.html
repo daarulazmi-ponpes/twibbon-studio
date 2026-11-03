@@ -406,8 +406,8 @@
       </div>
 
       <ul class="admin-nav">
-        <li><a href="#" class="active"><span class="icon">📊</span> Dashboard</a></li>
-        <li><a href="#"><span class="icon">📋</span> Kampanye</a></li>
+        <li><a href="#" class="active" data-page="dashboard"><span class="icon">📊</span> Dashboard</a></li>
+        <li><a href="#" data-page="settings"><span class="icon">⚙️</span> Pengaturan</a></li>
         <li><a href="index.html" target="_blank"><span class="icon">🌐</span> Lihat Website</a></li>
         <li><a href="editor.html" target="_blank"><span class="icon">🎨</span> Coba Editor</a></li>
       </ul>
@@ -451,9 +451,21 @@
       </div>
 
       <!-- Publish Alert -->
-      <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <strong>⚠️ Penting:</strong> Kampanye yang Anda buat hanya tersimpan di browser ini.
-        Untuk agar semua pengunjung bisa melihat kampanye, klik tombol <strong>"📤 Publish ke GitHub"</strong> di bawah.
+      <div style="background: #d4edda; border: 1px solid #28a745; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>✅ Deploy Otomatis:</strong> Setelah membuat kampanye, klik tombol <strong>"🚀 Deploy ke Live Site"</strong> 
+        dan semua gambar + data akan otomatis ter-upload ke GitHub. Pastikan Anda sudah mengatur token GitHub di menu <strong>"⚙️ Pengaturan"</strong>.
+      </div>
+
+      <!-- Deploy Status -->
+      <div id="deploy-status" style="display: none; background: #cce5ff; border: 1px solid #007bff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <strong>📤 Sedang deploy...</strong>
+          <span id="deploy-progress-text">0%</span>
+        </div>
+        <div style="background: #e9ecef; border-radius: 4px; height: 8px; overflow: hidden;">
+          <div id="deploy-progress-bar" style="background: #28a745; height: 100%; width: 0%; transition: width 0.3s;"></div>
+        </div>
+        <p id="deploy-message" style="margin-top: 0.5rem; font-size: 0.875rem; color: #495057;"></p>
       </div>
 
       <!-- Campaign Table -->
@@ -461,7 +473,7 @@
         <div class="admin-card-header">
           <h2>Daftar Kampanye</h2>
           <div style="display: flex; gap: 0.5rem;">
-            <button class="btn btn-outline" id="btn-publish" style="background: #28a745; color: white; border-color: #28a745;">📤 Publish ke GitHub</button>
+            <button class="btn btn-outline" id="btn-deploy" style="background: #007bff; color: white; border-color: #007bff;">🚀 Deploy ke Live Site</button>
             <button class="btn btn-primary" id="btn-add-campaign">+ Tambah Kampanye</button>
           </div>
         </div>
@@ -485,6 +497,54 @@
           </table>
         </div>
       </div>
+
+      <!-- Settings Page -->
+      <div id="settings-page" style="display: none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h2>⚙️ Pengaturan Deploy</h2>
+          </div>
+          <div class="admin-card-body">
+            <div style="background: #e7f3ff; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+              <strong>🔑 GitHub Token</strong>
+              <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #495057;">
+                Token GitHub diperlukan untuk deploy otomatis ke live site. Token ini disimpan di browser Anda dan tidak dikirim ke server lain.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="github-token">GitHub Personal Access Token</label>
+              <input type="password" class="form-control" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+              <small style="color: var(--dark-gray);">
+                Buat token di <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> dengan scope "repo"
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="github-repo">Repository</label>
+              <input type="text" class="form-control" id="github-repo" value="daarulazmi-ponpes/twibbon-studio" readonly>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+              <button class="btn btn-primary" id="btn-save-token">💾 Simpan Token</button>
+              <button class="btn btn-outline" id="btn-test-token">🔍 Test Koneksi</button>
+            </div>
+
+            <div id="token-status" style="margin-top: 1rem;"></div>
+
+            <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+              <strong>📋 Cara Deploy:</strong>
+              <ol style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                <li>Buat atau edit kampanye di halaman Dashboard</li>
+                <li>Klik tombol <strong>"🚀 Deploy ke Live Site"</strong></li>
+                <li>Tunggu proses upload selesai (beberapa detik)</li>
+                <li>Kampanye akan muncul di <a href="https://twibbon.daarulazmi.ponpes.id" target="_blank">twibbon.daarulazmi.ponpes.id</a></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -526,17 +586,10 @@
           <div class="form-group">
             <label class="form-label" for="campaign-cover">Cover Image <span style="color: #999;">(opsional)</span></label>
             <input type="file" class="form-control" id="campaign-cover-file" accept="image/png,image/jpeg,image/webp">
-            <small style="color: var(--dark-gray);">Pilih gambar dari galeri, lalu upload file ke path yang ditampilkan</small>
+            <small style="color: var(--dark-gray);">Pilih gambar dari galeri. Gambar akan otomatis di-upload saat deploy ke GitHub.</small>
             <div id="cover-preview" style="margin-top: 0.5rem; display: none;">
               <img id="cover-preview-img" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid #ddd;">
               <button type="button" class="btn btn-sm" style="margin-left: 0.5rem; background: #dc3545; color: white;" onclick="document.getElementById('campaign-cover-file').value=''; document.getElementById('cover-preview').style.display='none'; window.coverPath='';">Hapus</button>
-            </div>
-            <div style="background: #d1ecf1; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; font-size: 0.875rem; color: #0c5460;">
-              <strong>📋 Cara upload cover:</strong><br>
-              1. Pilih gambar di atas<br>
-              2. Upload file gambar ke path: <code id="cover-path-hint">campaigns/{id-kampanye}/cover.png</code><br>
-              3. Upload via GitHub web: <a href="https://github.com/daarulazmi-ponpes/twibbon-studio/tree/main/campaigns" target="_blank">twibbon-studio/campaigns</a><br>
-              4. Atau via Git: <code>git add campaigns/ && git commit -m "add cover" && git push</code>
             </div>
           </div>
 

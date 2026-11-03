@@ -97,7 +97,308 @@
     localStorage.setItem('twibbon_campaigns', JSON.stringify(campaigns));
   }
 
-  // Publish campaigns - generates JSON file for Git commit
+  // GitHub API Configuration
+  const GITHUB_REPO = 'daarulazmi-ponpes/twibbon-studio';
+  const GITHUB_BRANCH = 'main';
+  const GITHUB_API_BASE = 'https://api.github.com';
+
+  // Get GitHub token from localStorage
+  function getGitHubToken() {
+    return localStorage.getItem('github_token') || '';
+  }
+
+  // Save GitHub token to localStorage
+  function saveGitHubToken(token) {
+    localStorage.setItem('github_token', token);
+  }
+
+  // Test GitHub connection
+  async function testGitHubConnection() {
+    const token = getGitHubToken();
+    if (!token) {
+      showNotification('Silakan simpan token GitHub terlebih dahulu', 'error');
+      return;
+    }
+
+    const statusEl = document.getElementById('token-status');
+    if (statusEl) {
+      statusEl.innerHTML = '<div style="color: #007bff;">🔄 Menguji koneksi...</div>';
+    }
+
+    try {
+      const response = await fetch(`${GITHUB_API_BASE}/repos/${GITHUB_REPO}`, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (response.ok) {
+        const repo = await response.json();
+        if (statusEl) {
+          statusEl.innerHTML = '<div style="color: #28a745;">✅ Koneksi berhasil! Repository: ' + repo.name + '</div>';
+        }
+        showNotification('Koneksi GitHub berhasil!');
+      } else {
+        if (statusEl) {
+          statusEl.innerHTML = '<div style="color: #dc3545;">❌ Gagal terhubung. Periksa token dan repository.</div>';
+        }
+        showNotification('Gagal terhubung ke GitHub', 'error');
+      }
+    } catch (error) {
+      if (statusEl) {
+        statusEl.innerHTML = '<div style="color: #dc3545;">❌ Error: ' + error.message + '</div>';
+      }
+      showNotification('Error koneksi: ' + error.message, 'error');
+    }
+  }
+
+  // Get file content from GitHub
+  async function getGitHubFile(path, sha = null) {
+    const token = getGitHubToken();
+    const url = `${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/${path}`;
+    
+    const headers = {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json'
+    };
+
+    const response = await fetch(url, { headers });
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`Failed to get file: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      content: data.content,
+      sha: data.sha
+    };
+  }
+
+  // Create or update file on GitHub
+  async function createOrUpdateFile(path, content, message, sha = null) {
+    const token = getGitHubToken();
+    const url = `${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/${path}`;
+
+    const body = {
+      message: message,
+      content: content,
+      branch: GITHUB_BRANCH
+    };
+
+    if (sha) {
+      body.sha = sha;
+    }
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || `Failed to create file: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
+  // Convert base64 to binary blob
+  function base64ToBlob(base64, mimeType) {
+    const byteString = atob(base64.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeType });
+  }
+
+  // Get image MIME type from base64
+  function getImageMimeType(base64) {
+    if (base64.startsWith('data:image/png')) return 'image/png';
+    if (base64.startsWith('data:image/webp')) return 'image/webp';
+    if (base64.startsWith('data:image/jpeg')) return 'image/jpeg';
+    return 'image/png';
+  }
+
+  // Get file extension from MIME type
+  function getExtensionFromMime(mimeType) {
+    if (mimeType === 'image/png') return 'png';
+    if (mimeType === 'image/webp') return 'webp';
+    if (mimeType === 'image/jpeg') return 'jpg';
+    return 'png';
+  }
+
+  // Update deploy progress
+  function updateDeployProgress(percent, message) {
+    const statusEl = document.getElementById('deploy-status');
+    const progressBar = document.getElementById('deploy-progress-bar');
+    const progressText = document.getElementById('deploy-progress-text');
+    const messageEl = document.getElementById('deploy-message');
+
+    if (statusEl) statusEl.style.display = 'block';
+    if (progressBar) progressBar.style.width = percent + '%';
+    if (progressText) progressText.textContent = percent + '%';
+    if (messageEl) messageEl.textContent = message;
+  }
+
+  // Hide deploy progress
+  function hideDeployProgress() {
+    const statusEl = document.getElementById('deploy-status');
+    if (statusEl) statusEl.style.display = 'none';
+  }
+
+  // Deploy campaigns to GitHub automatically
+  async function deployToGitHub() {
+    const token = getGitHubToken();
+    if (!token) {
+      showNotification('Silakan atur token GitHub di menu ⚙️ Pengaturan terlebih dahulu', 'error');
+      return;
+    }
+
+    const campaigns = loadCampaigns();
+    if (!campaigns || campaigns.length === 0) {
+      showNotification('Tidak ada kampanye untuk di-deploy', 'error');
+      return;
+    }
+
+    updateDeployProgress(0, 'Memulai deploy...');
+
+    try {
+      let progress = 0;
+      const totalFiles = campaigns.length * 2; // cover + frames per campaign
+
+      // Step 1: Upload images for each campaign
+      for (let i = 0; i < campaigns.length; i++) {
+        const campaign = campaigns[i];
+        const campaignFolder = 'assets/images/campaigns/' + campaign.id;
+
+        // Upload cover image
+        if (campaign.cover && campaign.cover.startsWith('data:')) {
+          updateDeployProgress(progress, `Upload cover: ${campaign.title}...`);
+          
+          const mimeType = getImageMimeType(campaign.cover);
+          const ext = getExtensionFromMime(mimeType);
+          const coverPath = campaignFolder + '/cover.' + ext;
+
+          try {
+            const existing = await getGitHubFile(coverPath);
+            const sha = existing ? existing.sha : null;
+            await createOrUpdateFile(
+              coverPath,
+              campaign.cover.replace(/^data:image\/\w+;base64,/, ''),
+              `Deploy cover: ${campaign.title}`,
+              sha
+            );
+          } catch (error) {
+            console.error('Failed to upload cover:', error);
+          }
+
+          progress = Math.round(((i + 1) / totalFiles) * 50);
+          updateDeployProgress(progress, `Cover ${campaign.title} berhasil`);
+        }
+
+        // Upload frame images
+        if (campaign.frames && campaign.frames.length > 0) {
+          for (let j = 0; j < campaign.frames.length; j++) {
+            const frame = campaign.frames[j];
+            if (frame.image && frame.image.startsWith('data:')) {
+              updateDeployProgress(progress, `Upload frame ${j + 1}: ${campaign.title}...`);
+              
+              const mimeType = getImageMimeType(frame.image);
+              const ext = getExtensionFromMime(mimeType);
+              const framePath = campaignFolder + '/frame-' + (j + 1) + '.' + ext;
+
+              try {
+                const existing = await getGitHubFile(framePath);
+                const sha = existing ? existing.sha : null;
+                await createOrUpdateFile(
+                  framePath,
+                  frame.image.replace(/^data:image\/\w+;base64,/, ''),
+                  `Deploy frame: ${campaign.title} - ${frame.name}`,
+                  sha
+                );
+              } catch (error) {
+                console.error('Failed to upload frame:', error);
+              }
+
+              progress = Math.round(((i * campaign.frames.length + j + 1) / totalFiles) * 50);
+            }
+          }
+        }
+      }
+
+      // Step 2: Update campaigns.json with correct paths
+      updateDeployProgress(60, 'Mempersiapkan data JSON...');
+
+      const campaignsData = campaigns.map(c => {
+        const newCampaign = { ...c };
+        
+        // Update cover path
+        if (newCampaign.cover && newCampaign.cover.startsWith('data:')) {
+          const mimeType = getImageMimeType(newCampaign.cover);
+          const ext = getExtensionFromMime(mimeType);
+          newCampaign.cover = 'assets/images/campaigns/' + newCampaign.id + '/cover.' + ext;
+        }
+
+        // Update frame paths
+        if (newCampaign.frames) {
+          newCampaign.frames = newCampaign.frames.map((frame, index) => {
+            const newFrame = { ...frame };
+            if (newFrame.image && newFrame.image.startsWith('data:')) {
+              const mimeType = getImageMimeType(newFrame.image);
+              const ext = getExtensionFromMime(mimeType);
+              newFrame.image = 'assets/images/campaigns/' + newCampaign.id + '/frame-' + (index + 1) + '.' + ext;
+            }
+            return newFrame;
+          });
+        }
+
+        return newCampaign;
+      });
+
+      const jsonContent = JSON.stringify({ campaigns: campaignsData }, null, 2);
+
+      // Step 3: Update campaigns.json on GitHub
+      updateDeployProgress(75, 'Update campaigns.json...');
+      
+      try {
+        const existingJson = await getGitHubFile('data/campaigns.json');
+        const jsonSha = existingJson ? existingJson.sha : null;
+        await createOrUpdateFile(
+          'data/campaigns.json',
+          jsonContent,
+          'Deploy campaigns: ' + campaigns.length + ' campaigns',
+          jsonSha
+        );
+      } catch (error) {
+        console.error('Failed to update campaigns.json:', error);
+        throw new Error('Gagal update campaigns.json: ' + error.message);
+      }
+
+      // Step 4: Complete
+      updateDeployProgress(100, 'Deploy berhasil!');
+      
+      setTimeout(() => {
+        hideDeployProgress();
+        showNotification(`✅ Deploy berhasil! ${campaigns.length} kampanye sudah online.`);
+      }, 1000);
+
+    } catch (error) {
+      updateDeployProgress(0, 'Error: ' + error.message);
+      showNotification('Deploy gagal: ' + error.message, 'error');
+      console.error('Deploy error:', error);
+    }
+  }
+
+  // Publish campaigns - generates JSON file for Git commit (fallback method)
   function publishCampaigns() {
     const campaigns = loadCampaigns() || [];
     
@@ -509,8 +810,42 @@
     const btnCancel = document.getElementById('btn-cancel-modal');
     const btnSave = document.getElementById('btn-save-campaign');
     const btnAddFrame = document.getElementById('btn-add-frame');
-    const btnPublish = document.getElementById('btn-publish');
+    const btnDeploy = document.getElementById('btn-deploy');
+    const btnSaveToken = document.getElementById('btn-save-token');
+    const btnTestToken = document.getElementById('btn-test-token');
     const coverFileInput = document.getElementById('campaign-cover-file');
+
+    // Navigation between pages
+    const navLinks = document.querySelectorAll('.admin-nav a[data-page]');
+    const dashboardPage = document.querySelector('.admin-card');
+    const settingsPage = document.getElementById('settings-page');
+
+    navLinks.forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const page = this.getAttribute('data-page');
+        
+        // Update active state
+        navLinks.forEach(function(l) { l.classList.remove('active'); });
+        this.classList.add('active');
+
+        // Show/hide pages
+        if (page === 'settings') {
+          if (dashboardPage) dashboardPage.style.display = 'none';
+          if (settingsPage) settingsPage.style.display = 'block';
+          
+          // Load saved token
+          const token = getGitHubToken();
+          const tokenInput = document.getElementById('github-token');
+          if (tokenInput && token) {
+            tokenInput.value = token;
+          }
+        } else {
+          if (dashboardPage) dashboardPage.style.display = 'block';
+          if (settingsPage) settingsPage.style.display = 'none';
+        }
+      });
+    });
 
     if (btnAdd) {
       btnAdd.addEventListener('click', function() {
@@ -518,30 +853,58 @@
       });
     }
 
-    if (btnPublish) {
-      btnPublish.addEventListener('click', function() {
+    // Deploy button - automatic GitHub deploy
+    if (btnDeploy) {
+      btnDeploy.addEventListener('click', function() {
         const campaigns = loadCampaigns() || [];
         
         if (campaigns.length === 0) {
-          showNotification('Tidak ada kampanye untuk dipublish', 'error');
+          showNotification('Tidak ada kampanye untuk di-deploy', 'error');
           return;
         }
 
-        // Show publish instructions modal
         const confirmed = confirm(
-          '📤 PUBLISH KAMPANYE\n\n' +
-          '1. File campaigns.json akan didownload ke komputer Anda\n' +
-          '2. Buka https://github.com/daarulazmi-ponpes/twibbon-studio/tree/main/data\n' +
-          '3. Klik "Upload files" dan pilih file campaigns.json yang didownload\n' +
-          '4. Klik "Commit changes" di bawah\n' +
-          '5. Tunggu 1-2 menit agar GitHub Pages rebuild\n\n' +
-          'Lanjutkan download file?'
+          '🚀 DEPLOY KE LIVE SITE\n\n' +
+          'Semua ' + campaigns.length + ' kampanye akan di-upload ke GitHub secara otomatis.\n' +
+          'Gambar dan data JSON akan langsung tersedia di twibbon.daarulazmi.ponpes.id\n\n' +
+          'Lanjutkan deploy?'
         );
 
         if (confirmed) {
-          publishCampaigns();
+          deployToGitHub();
         }
       });
+    }
+
+    // Save GitHub token
+    if (btnSaveToken) {
+      btnSaveToken.addEventListener('click', function() {
+        const tokenInput = document.getElementById('github-token');
+        const token = tokenInput.value.trim();
+        
+        if (!token) {
+          showNotification('Masukkan token GitHub', 'error');
+          return;
+        }
+
+        if (!token.startsWith('ghp_')) {
+          showNotification('Token GitHub tidak valid. Harus dimulai dengan "ghp_"', 'error');
+          return;
+        }
+
+        saveGitHubToken(token);
+        showNotification('✅ Token GitHub berhasil disimpan!');
+        
+        const statusEl = document.getElementById('token-status');
+        if (statusEl) {
+          statusEl.innerHTML = '<div style="color: #28a745;">✅ Token disimpan. Klik "🔍 Test Koneksi" untuk verifikasi.</div>';
+        }
+      });
+    }
+
+    // Test GitHub connection
+    if (btnTestToken) {
+      btnTestToken.addEventListener('click', testGitHubConnection);
     }
 
     if (btnClose) {
@@ -560,7 +923,7 @@
       btnAddFrame.addEventListener('click', addFrame);
     }
 
-    // Cover file upload - generates path suggestion
+    // Cover file upload - store base64 directly
     if (coverFileInput) {
       coverFileInput.addEventListener('change', async function(e) {
         const file = e.target.files[0];
@@ -572,9 +935,9 @@
             return;
           }
 
-          // Validate file size (max 5MB for cover)
-          if (file.size > 5 * 1024 * 1024) {
-            showNotification('Ukuran file terlalu besar. Maksimal 5MB', 'error');
+          // Validate file size (max 1MB)
+          if (file.size > 1 * 1024 * 1024) {
+            showNotification('Ukuran file terlalu besar. Maksimal 1MB', 'error');
             e.target.value = '';
             return;
           }
@@ -582,28 +945,15 @@
           try {
             const base64 = await fileToBase64(file);
             
-            // Resize for OG if image is too large
-            let previewBase64 = base64;
-            if (file.size > 200 * 1024) {
-              previewBase64 = await resizeImageForOG(base64, 1200, 630, 0.8);
-            }
-
-            // Store the file name as path reference
-            const campaignId = document.getElementById('campaign-id').value || 'campaign-' + Date.now();
-            window.coverPath = 'campaigns/' + campaignId + '/cover.png';
+            // Store base64 directly - will be uploaded to GitHub on deploy
+            window.coverPath = base64;
             
             const coverPreview = document.getElementById('cover-preview');
             const coverPreviewImg = document.getElementById('cover-preview-img');
-            coverPreviewImg.src = previewBase64;
+            coverPreviewImg.src = base64;
             coverPreview.style.display = 'block';
             
-            // Update path hint
-            const pathHint = document.getElementById('cover-path-hint');
-            if (pathHint) {
-              pathHint.textContent = window.coverPath;
-            }
-            
-            showNotification('Cover dipilih. Upload file ke: ' + window.coverPath);
+            showNotification('Cover dipilih. Akan di-upload saat deploy ke GitHub.');
           } catch (error) {
             showNotification('Gagal membaca gambar', 'error');
             e.target.value = '';
