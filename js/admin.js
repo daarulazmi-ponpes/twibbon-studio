@@ -291,8 +291,8 @@
     const endDate = document.getElementById('campaign-end-date').value;
 
     // Validation
-    if (!title || !description || !category || !cover) {
-      showNotification('Mohon lengkapi semua field yang wajib diisi', 'error');
+    if (!title || !description || !category) {
+      showNotification('Mohon lengkapi judul, deskripsi, dan kategori', 'error');
       return;
     }
 
