@@ -176,19 +176,38 @@
     };
   }
 
+  // Convert text string to Base64
+  function textToBase64(text) {
+    try {
+      // Use btoa for simple ASCII, or Uint8Array for Unicode
+      const bytes = new TextEncoder().encode(text);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    } catch (e) {
+      console.error('Failed to encode text to base64:', e);
+      throw new Error('Gagal mengkonversi teks ke Base64');
+    }
+  }
+
   // Create or update file on GitHub
   async function createOrUpdateFile(path, content, message, sha = null) {
     const token = getGitHubToken();
     const url = `${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/${path}`;
 
-    // Validate base64 content before sending
+    // GitHub API requires content to be Base64 encoded
+    // If content is not valid Base64, assume it's plain text and encode it
+    let encodedContent = content;
     if (!isValidBase64(content)) {
-      throw new Error('Content bukan valid Base64 untuk file: ' + path);
+      console.log('Encoding text content to Base64 for:', path);
+      encodedContent = textToBase64(content);
     }
 
     const body = {
       message: message,
-      content: content,
+      content: encodedContent,
       branch: GITHUB_BRANCH
     };
 
