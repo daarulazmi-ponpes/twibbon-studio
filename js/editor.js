@@ -42,6 +42,17 @@ const EditorModule = (function() {
       
       // Update page title
       document.getElementById('campaign-title').textContent = currentCampaign.title;
+      document.title = currentCampaign.title + ' - Editor Twibbon';
+      
+      // Update OG meta tags with campaign cover
+      if (currentCampaign.cover) {
+        const ogImage = document.getElementById('og-image');
+        const ogImageSecure = document.getElementById('og-image-secure');
+        const ogImageAlt = document.getElementById('og-image-alt');
+        if (ogImage) ogImage.setAttribute('content', currentCampaign.cover);
+        if (ogImageSecure) ogImageSecure.setAttribute('content', currentCampaign.cover);
+        if (ogImageAlt) ogImageAlt.setAttribute('content', currentCampaign.title);
+      }
       
       // Set frame index from URL parameter if provided
       if (frameIndex !== null) {

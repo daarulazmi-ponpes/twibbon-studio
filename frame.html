@@ -6,6 +6,17 @@
   <title>Pilih Frame - Daarul Azmi Twibbon Studio</title>
   <meta name="description" content="Pilih frame Twibbon untuk kampanye.">
   
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://twibbon.daarulazmi.ponpes.id/frame.html">
+  <meta property="og:title" content="Pilih Frame - Daarul Azmi Twibbon Studio">
+  <meta property="og:description" content="Pilih frame Twibbon untuk kampanye.">
+  <meta property="og:image" id="og-image" content="https://twibbon.daarulazmi.ponpes.id/assets/logo/logo.png">
+  <meta property="og:image:secure_url" id="og-image-secure" content="https://twibbon.daarulazmi.ponpes.id/assets/logo/logo.png">
+  <meta property="og:image:alt" id="og-image-alt" content="Daarul Azmi Twibbon Studio">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Pilih Frame - Daarul Azmi Twibbon Studio">
+  
   <link rel="icon" href="assets/logo/logo.png" type="image/png">
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/layout.css">
@@ -212,6 +223,19 @@
         
         document.getElementById('campaign-title').textContent = campaign.title;
         document.getElementById('campaign-description').textContent = campaign.description;
+        
+        // Update page title
+        document.title = campaign.title + ' - Pilih Frame';
+        
+        // Update OG meta tags with campaign cover
+        if (campaign.cover) {
+          const ogImage = document.getElementById('og-image');
+          const ogImageSecure = document.getElementById('og-image-secure');
+          const ogImageAlt = document.getElementById('og-image-alt');
+          if (ogImage) ogImage.setAttribute('content', campaign.cover);
+          if (ogImageSecure) ogImageSecure.setAttribute('content', campaign.cover);
+          if (ogImageAlt) ogImageAlt.setAttribute('content', campaign.title);
+        }
         
         const framesGrid = document.getElementById('frames-grid');
         const noFrames = document.getElementById('no-frames');
